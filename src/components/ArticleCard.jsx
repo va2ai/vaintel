@@ -14,10 +14,10 @@ export function ArticleCard({ article, onClick, variant = 'default' }) {
   if (variant === 'featured') {
     const bgStyle = article.heroImage
       ? {
-          backgroundImage: `linear-gradient(135deg, rgba(11,26,46,0.92), rgba(11,26,46,0.97)), url(${article.heroImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }
+        backgroundImage: `linear-gradient(135deg, rgba(11,26,46,0.92), rgba(11,26,46,0.97)), url(${article.heroImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
       : {};
 
     return (
@@ -55,25 +55,44 @@ export function ArticleCard({ article, onClick, variant = 'default' }) {
   }
 
   // default variant
+  const categoryStr = String(article.category || article.section || '');
+  let bgGradient = 'linear-gradient(135deg, var(--navy-800), var(--navy-900))';
+
+  if (categoryStr.includes('Policy')) {
+    bgGradient = 'linear-gradient(135deg, #1e3a8a, #0f172a)'; // Blue
+  } else if (categoryStr.includes('CAVC') || categoryStr.includes('Appeals')) {
+    bgGradient = 'linear-gradient(135deg, #4c1d95, #18181b)'; // Purple
+  } else if (categoryStr.includes('Strategy') || categoryStr.includes('Claims')) {
+    bgGradient = 'linear-gradient(135deg, #065f46, #022c22)'; // Green
+  } else if (categoryStr.includes('Mental Health') || categoryStr.includes('PTSD')) {
+    bgGradient = 'linear-gradient(135deg, #991b1b, #450a0a)'; // Red
+  } else if (categoryStr.includes('Opinion')) {
+    bgGradient = 'linear-gradient(135deg, #9a3412, #431407)'; // Orange
+  }
+
+  // Use the unique image if it exists, otherwise fall back to the category gradient
+  const thumbStyle = article.heroImage
+    ? {
+      backgroundImage: `linear-gradient(135deg, rgba(11,26,46,0.25), rgba(11,26,46,0.5)), url(${article.heroImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }
+    : {
+      background: bgGradient,
+    };
+
   return (
-    <article className="pub-card pub-card--default" onClick={() => onClick?.(article)}>
-      {article.heroImage && (
-        <div
-          className="pub-card__thumb"
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(11,26,46,0.25), rgba(11,26,46,0.5)), url(${article.heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+    <article className={`pub-card pub-card--${variant}`} onClick={() => onClick?.(article)}>
+      {variant !== 'text-forward' && (
+        <div className="pub-card__thumb" style={thumbStyle} />
       )}
       <div className="pub-card__content">
         <div className="pub-card__section">{article.category || article.section}</div>
         <h3 className="pub-card__title">{article.title}</h3>
-        <p className="pub-card__excerpt">{article.excerpt}</p>
+        {article.excerpt && <p className="pub-card__excerpt">{article.excerpt}</p>}
         <div className="pub-card__meta">
           <span className="pub-card__read-time">
-            <ClockIcon /> {article.readTime}
+            <ClockIcon /> {article.readTime || '5 min'}
           </span>
           {article.tags && article.tags.length > 0 && (
             <div className="pub-card__tags">

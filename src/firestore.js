@@ -13,6 +13,7 @@ const ARTICLES = "articles";
 const GUIDES = "guides";
 const NEWS = "news";
 const SUBSCRIBERS = "subscribers";
+const PIPELINE_REVIEWS = "pipelineReviews";
 
 function compareDesc(a, b) {
   if (a === b) return 0;
@@ -45,6 +46,10 @@ export async function getNews() {
   return getCollectionDocs(NEWS, "timestamp");
 }
 
+export async function getPipelineReviews() {
+  return getCollectionDocs(PIPELINE_REVIEWS, "updatedAt");
+}
+
 export async function getPost(id) {
   const snap = await getDoc(doc(lazyDb(), POSTS, String(id)));
   return snap.exists() ? { ...snap.data(), _id: snap.id } : null;
@@ -72,6 +77,13 @@ export async function saveNews(id, data) {
   await setDoc(doc(lazyDb(), NEWS, id), data, { merge: true });
 }
 
+export async function savePipelineReview(id, data) {
+  await setDoc(doc(lazyDb(), PIPELINE_REVIEWS, String(id)), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
 export async function deletePost(id) {
   await deleteDoc(doc(lazyDb(), POSTS, String(id)));
 }
@@ -86,6 +98,10 @@ export async function deleteGuide(id) {
 
 export async function deleteNewsItem(id) {
   await deleteDoc(doc(lazyDb(), NEWS, id));
+}
+
+export async function deletePipelineReview(id) {
+  await deleteDoc(doc(lazyDb(), PIPELINE_REVIEWS, String(id)));
 }
 
 // ── Subscribers ─────────────────────────────────────────────

@@ -44,6 +44,10 @@ service cloud.firestore {
       allow read, update, delete: if isAdminEmail();
     }
 
+    match /pipelineReviews/{docId} {
+      allow read, create, update, delete: if isAdminEmail();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

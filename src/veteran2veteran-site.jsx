@@ -8,7 +8,7 @@ import { ArticlePage } from './components/ArticlePage.jsx';
 import { GuidePage } from './components/GuidePage.jsx';
 import { ToolsSection } from './components/ToolsSection.jsx';
 import { SearchOverlay } from './components/SearchOverlay.jsx';
-import { NewsletterSignup } from './components/NewsletterSignup.jsx';
+import { NewsletterSignup, NewsletterHeroCTA } from './components/NewsletterSignup.jsx';
 import { Chat } from './components/Chat.jsx';
 import { getPosts, getGuides, getNews } from './firestore.js';
 
@@ -131,7 +131,7 @@ export default function V2VSite() {
       const id = articleMatch[1];
       const post = posts.find(p => String(p.id) === id);
       if (post) { setActiveArticle(post); setActiveNews(null); setActiveGuide(null); return; }
-      
+
       const newsItem = news.find(n => String(n.id) === id);
       if (newsItem) { setActiveNews(newsItem); setActiveArticle(null); setActiveGuide(null); return; }
     }
@@ -148,7 +148,7 @@ export default function V2VSite() {
       setActiveNews(null);
       setActiveGuide(null);
       // Scroll to tools after render
-      setTimeout(() => document.getElementById("resources")?.scrollIntoView({ behavior: "smooth" }), 100);
+      setTimeout(() => document.getElementById("resources")?.scrollIntoView(), 100);
       return;
     }
     // / or unknown -> homepage
@@ -248,10 +248,10 @@ export default function V2VSite() {
           onArticleClick={openNews}
           isNews={true}
         />
-        <Chat 
-          contextTitle={activeNews.title} 
-          contextType="news story" 
-          contextText={activeNews.summary || activeNews.body} 
+        <Chat
+          contextTitle={activeNews.title}
+          contextType="news story"
+          contextText={activeNews.summary || activeNews.body}
           suggestions={isMedRule ? medSuggestions : null}
         />
         <SearchOverlay posts={posts} guides={guides} news={news} isOpen={searchOpen} onClose={() => setSearchOpen(false)} onNavigate={handleSearchNavigate} />
@@ -324,15 +324,43 @@ export default function V2VSite() {
 
   return (
     <Layout activeSection="latest" onSearchClick={() => setSearchOpen(true)}>
-      
+
       {/* ── Authority Publication Masthead ── */}
-      <div style={{ background: "var(--navy-900)", padding: "32px 24px", textAlign: "center", borderBottom: "4px solid var(--gold-500)" }}>
-        <h1 style={{ fontFamily: "var(--serif)", fontSize: "clamp(28px, 5vw, 42px)", fontWeight: 700, color: "white", margin: "0 0 8px 0", letterSpacing: "-0.5px" }}>
-          VA Claims Intelligence
-        </h1>
-        <p style={{ fontFamily: "var(--sans)", fontSize: "clamp(14px, 2vw, 16px)", color: "var(--gold-400)", margin: 0, fontWeight: 500, letterSpacing: "0.5px" }}>
-          Independent reporting and claims intelligence for VA disability claims, appeals, and case strategy.
-        </p>
+      <div className="pub-masthead">
+        <div className="pub-masthead__inner">
+          <h1 className="pub-masthead__headline">
+            VA Claims Intelligence
+          </h1>
+          <p className="pub-masthead__subheadline">
+            Policy updates, case analysis, and strategy for veterans and advocates.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Credibility Strip ── */}
+      <div className="pub-credibility-strip">
+        <div className="pub-credibility-strip__inner">
+          <span>Coverage includes:</span>
+          <strong>VA policy updates</strong>
+          <span className="dot" />
+          <strong>Claims strategy analysis</strong>
+          <span className="dot" />
+          <strong>CAVC case breakdowns</strong>
+        </div>
+      </div>
+
+      {/* ── Topic Navigation Strip ── */}
+      <div className="topic-nav-strip">
+        <div className="topic-nav-strip__inner hide-scroll">
+          <span className="topic-nav-label">Topics:</span>
+          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>PTSD</button>
+          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Sleep Apnea</button>
+          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>TDIU</button>
+          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Migraines</button>
+          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Back Pay</button>
+          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>CAVC</button>
+          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Policy Updates</button>
+        </div>
       </div>
 
       {/* Hero + Latest Rail (Authority Layer Top) */}
@@ -388,7 +416,7 @@ export default function V2VSite() {
       {/* ── AI Tools (Product Layer seamlessly integrated) ── */}
       <div style={{ background: "var(--white)", borderTop: "1px solid var(--cream-border)", borderBottom: "1px solid var(--cream-border)" }}>
         <ToolsSection
-          onChatOpen={() => {}}
+          onChatOpen={() => { }}
           guides={guides}
           onGuideClick={openGuide}
         />

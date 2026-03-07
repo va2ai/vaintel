@@ -5,6 +5,7 @@ import {
   getPosts, getArticles, getGuides, getNews,
   savePost, saveArticle, saveGuide, saveNews,
   deletePost, deleteArticle, deleteGuide, deleteNewsItem,
+  getPipelineReviews, savePipelineReview, deletePipelineReview,
   uploadImage,
 } from "./firestore.js";
 import { marked } from "marked";
@@ -27,7 +28,7 @@ function isPermissionError(error) {
 function formatAdminError(error, user, action = "complete this action") {
   if (isPermissionError(error)) {
     const email = user?.email || "your signed-in account";
-    return `Firebase denied the write for ${email}. This admin UI is working, but your Firestore or Storage security rules do not allow this account to ${action}. Update the Firebase rules for the vaclaims-194006 project to allow the admin user to write posts, guides, news, and uploaded images.`;
+    return `Firebase denied the write for ${email}. This admin UI is working, but your Firestore or Storage security rules do not allow this account to ${action}. Update the Firebase rules for the vaclaims-194006 project to allow the admin user to write posts, guides, news, pipelineReviews, and uploaded images.`;
   }
   return error?.message || `Failed to ${action}.`;
 }
@@ -81,6 +82,38 @@ async function loadStaticAdminContent() {
     guides: (guidesData || []).map((item) => ({ ...item, _collection: "guides" })),
     news: (newsData || []).map((item) => ({ ...item, _collection: "news" })),
   };
+}
+
+async function loadReviewQueue() {
+  const response = await fetch("/review-queue.json", { cache: "no-store" });
+  if (response.status === 404) return [];
+  if (!response.ok) {
+    throw new Error("Pipeline review queue could not be loaded.");
+  }
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
+
+function mapPipelineReviews(items) {
+  const mapped = {};
+  for (const item of items || []) {
+    const key = String(item?._id ?? item?.id ?? "");
+    if (!key) continue;
+    mapped[key] = item;
+  }
+  return mapped;
+}
+
+function getPipelineStatusMeta(status) {
+  if (status === "approved") return { label: "Approved", background: "#1a4d35", color: "#9ce4b7" };
+  if (status === "needs_revision") return { label: "Needs Revision", background: "#4a3312", color: "#f3ce8d" };
+  if (status === "rejected") return { label: "Rejected", background: "#4a1820", color: "#ffb4b4" };
+  return { label: "Pending Review", background: "#1a3a5c", color: "#c9a84c" };
+}
+
+function formatReadTime(readTime) {
+  if (readTime == null || readTime === "") return "";
+  return typeof readTime === "number" ? `${readTime} min` : String(readTime);
 }
 
 // Safe HTML rendering helper - all user content sanitized via DOMPurify
@@ -580,6 +613,214 @@ function ItemList({ items, type, onEdit, onDelete, onCreate }) {
   );
 }
 
+function PipelineReviewPanel({ items, statuses, onSetStatus, onOpenEditor }) {
+  const [selectedId, setSelectedId] = useState(items[0]?.id ?? null);
+
+  useEffect(() => {
+    if (!items.length) {
+      setSelectedId(null);
+      return;
+    }
+    if (!items.some((item) => item.id === selectedId)) {
+      setSelectedId(items[0].id);
+    }
+  }, [items, selectedId]);
+
+  const selected = items.find((item) => item.id === selectedId) || items[0] || null;
+  const selectedStatusRecord = selected ? statuses[selected.id] : null;
+  const selectedStatus = selectedStatusRecord?.status || null;
+  const selectedMeta = getPipelineStatusMeta(selectedStatus);
+  const scorecard = selected?.scorecard || null;
+  const findings = [
+    ...(scorecard?.blockItems || []).map((message) => ({ level: "Block", message })),
+    ...(scorecard?.flaggedItems || []).map((message) => ({ level: "Flag", message })),
+    ...(scorecard?.requiredRevisions || []).map((message) => ({ level: "Revision", message })),
+  ];
+
+  return (
+    <div>
+      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 16, alignItems: "start" }}>
+        <div>
+          <div style={{ ...S.card, padding: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ fontSize: 13, color: "#8aa3c8" }}>{items.length} pipeline drafts</span>
+              <button onClick={() => window.location.reload()} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Refresh</button>
+            </div>
+            {!items.length && (
+              <div style={{ color: "#8aa3c8", fontSize: 13, lineHeight: 1.6 }}>
+                No pipeline review items found. Run `node scripts/build-posts.cjs` after generating drafts.
+              </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {items.map((item) => {
+                const statusMeta = getPipelineStatusMeta(statuses[item.id]?.status);
+                const isSelected = item.id === selected?.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setSelectedId(item.id)}
+                    style={{
+                      ...S.card,
+                      textAlign: "left",
+                      padding: 14,
+                      marginBottom: 0,
+                      cursor: "pointer",
+                      background: isSelected ? "#132b4a" : "#0d2240",
+                      border: isSelected ? "1px solid #c9a84c" : "1px solid #1a3a5c",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, lineHeight: 1.4 }}>{item.title}</div>
+                      <span style={{ ...S.badge, background: statusMeta.background, color: statusMeta.color, whiteSpace: "nowrap" }}>
+                        {statusMeta.label}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "#8aa3c8", lineHeight: 1.5 }}>
+                      <span style={{ ...S.badge, background: "#152f4f", color: "#d8c18c", marginRight: 6 }}>{item.kind}</span>
+                      {item.category || item.section || "Uncategorized"}
+                      {item.scorecard?.overallScore != null ? `  Score ${item.scorecard.overallScore}` : ""}
+                      {item.scorecard?.publishReadiness ? `  ${item.scorecard.publishReadiness}` : ""}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          {!selected && (
+            <div style={{ ...S.card, color: "#8aa3c8" }}>
+              Select a pipeline draft to review.
+            </div>
+          )}
+          {selected && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={S.card}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 12, alignItems: "start" }}>
+                  <div>
+                    <h2 style={{ fontSize: 20, color: "#c9a84c", margin: "0 0 8px" }}>{selected.title}</h2>
+                    <div style={{ fontSize: 12, color: "#8aa3c8", lineHeight: 1.6 }}>
+                      {selected.date || selected.createdAt}
+                      {selected.readTime ? `  ${formatReadTime(selected.readTime)}` : ""}
+                      {selected.category ? `  ${selected.category}` : ""}
+                      {selected.section ? `  ${selected.section}` : ""}
+                    </div>
+                  </div>
+                  <span style={{ ...S.badge, background: selectedMeta.background, color: selectedMeta.color }}>
+                    {selectedMeta.label}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+                  <button onClick={() => onSetStatus(selected.id, "approved")} style={{ ...S.btn, ...S.btnGold }}>Approve</button>
+                  <button onClick={() => onSetStatus(selected.id, "needs_revision")} style={{ ...S.btn, background: "#5a3e18", color: "#f3d9a1" }}>Needs Revision</button>
+                  <button onClick={() => onSetStatus(selected.id, "rejected")} style={{ ...S.btn, background: "#4a1820", color: "#ffb4b4" }}>Reject</button>
+                  <button onClick={() => onSetStatus(selected.id, null)} style={{ ...S.btn, ...S.btnOutline }}>Clear Status</button>
+                  <button onClick={() => onOpenEditor(selected)} style={{ ...S.btn, ...S.btnOutline }}>
+                    Open In {selected.kind === "news" ? "News" : "Post"} Editor
+                  </button>
+                </div>
+                {selectedStatusRecord && (
+                  <div style={{ fontSize: 12, color: "#8aa3c8", marginBottom: 16 }}>
+                    Reviewed by {selectedStatusRecord.reviewerEmail || "unknown"} {selectedStatusRecord.updatedAt ? `on ${new Date(selectedStatusRecord.updatedAt).toLocaleString()}` : ""}
+                  </div>
+                )}
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                  <div style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 8, padding: 12 }}>
+                    <div style={S.label}>Readiness</div>
+                    <div style={{ fontSize: 18, fontWeight: 700 }}>{scorecard?.publishReadiness || "UNSCORED"}</div>
+                    <div style={{ fontSize: 12, color: "#8aa3c8", marginTop: 6 }}>{scorecard?.readinessReason || "No QA scorecard found."}</div>
+                  </div>
+                  <div style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 8, padding: 12 }}>
+                    <div style={S.label}>Score</div>
+                    <div style={{ fontSize: 18, fontWeight: 700 }}>{scorecard?.overallScore ?? "--"}</div>
+                    <div style={{ fontSize: 12, color: "#8aa3c8", marginTop: 6 }}>{scorecard?.assessmentMode || "No QA assessment"}</div>
+                  </div>
+                  <div style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 8, padding: 12 }}>
+                    <div style={S.label}>Draft ID</div>
+                    <div style={{ fontSize: 18, fontWeight: 700 }}>{selected.id}</div>
+                    <div style={{ fontSize: 12, color: "#8aa3c8", marginTop: 6 }}>{selected.kind === "news" ? "News candidate" : "Post candidate"}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div style={S.card}>
+                  <div style={S.label}>Excerpt</div>
+                  <div style={{ fontSize: 14, lineHeight: 1.7 }}>{selected.excerpt || "No excerpt."}</div>
+                  {selected.summary && (
+                    <>
+                      <div style={{ ...S.label, marginTop: 16 }}>Summary</div>
+                      <div style={{ fontSize: 14, lineHeight: 1.7 }}>{selected.summary}</div>
+                    </>
+                  )}
+                  {!!selected.titleAlternatives?.length && (
+                    <>
+                      <div style={{ ...S.label, marginTop: 16 }}>Title Alternatives</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {selected.titleAlternatives.map((title, index) => (
+                          <div key={`${selected.id}-title-${index}`} style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 6, padding: 10, fontSize: 13 }}>
+                            <div style={{ fontWeight: 600, marginBottom: 4 }}>{title?.headline || String(title)}</div>
+                            {title?.dek && <div style={{ color: "#8aa3c8", lineHeight: 1.6 }}>{title.dek}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div style={S.card}>
+                  <div style={S.label}>QA Findings</div>
+                  {!selected.qa && <div style={{ color: "#8aa3c8", fontSize: 13 }}>No QA report found for this draft yet.</div>}
+                  {!!selected.qa && !findings.length && <div style={{ color: "#8aa3c8", fontSize: 13 }}>No flagged or blocking findings. QA passed cleanly.</div>}
+                  {!!findings.length && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {findings.map((finding, index) => (
+                        <div key={`${selected.id}-finding-${index}`} style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 6, padding: 10 }}>
+                          <div style={{ ...S.badge, background: finding.level === "Block" ? "#4a1820" : "#4a3312", color: finding.level === "Block" ? "#ffb4b4" : "#f3ce8d", marginBottom: 8 }}>
+                            {finding.level}
+                          </div>
+                          <div style={{ fontSize: 13, lineHeight: 1.6 }}>{finding.message}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {!!scorecard?.categoryScores && (
+                    <>
+                      <div style={{ ...S.label, marginTop: 16 }}>Category Scores</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {Object.entries(scorecard.categoryScores).map(([key, value]) => (
+                          <div key={key} style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 6, padding: 10 }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{key}</div>
+                            <div style={{ fontSize: 12, color: "#8aa3c8" }}>
+                              {value.score}/{value.maxScore}  {value.status}
+                            </div>
+                            <div style={{ fontSize: 12, color: "#8aa3c8", marginTop: 4 }}>{value.details}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div style={S.card}>
+                <div style={S.label}>Draft Preview</div>
+                <div style={{ ...S.preview, maxHeight: "none" }}>
+                  <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28 }}>{selected.draft?.title || selected.title}</h1>
+                  <SafeHTML html={marked.parse(selected.draft?.body || "")} />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Migration Panel ──────────────────────────────────────────
 function MigrationPanel({ user }) {
   const [status, setStatus] = useState("");
@@ -633,6 +874,8 @@ export default function Admin() {
   const [posts, setPosts] = useState([]);
   const [guides, setGuides] = useState([]);
   const [news, setNews] = useState([]);
+  const [pipelineItems, setPipelineItems] = useState([]);
+  const [pipelineStatuses, setPipelineStatuses] = useState({});
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -652,32 +895,41 @@ export default function Admin() {
       firestoreArticlesResult,
       firestoreGuidesResult,
       firestoreNewsResult,
+      firestorePipelineReviewsResult,
       staticContentResult,
+      reviewQueueResult,
     ] = await Promise.allSettled([
       getPosts(),
       getArticles(),
       getGuides(),
       getNews(),
+      getPipelineReviews(),
       loadStaticAdminContent(),
+      loadReviewQueue(),
     ]);
 
     const firestorePosts = firestorePostsResult.status === "fulfilled" ? firestorePostsResult.value : [];
     const firestoreArticles = firestoreArticlesResult.status === "fulfilled" ? firestoreArticlesResult.value : [];
     const firestoreGuides = firestoreGuidesResult.status === "fulfilled" ? firestoreGuidesResult.value : [];
     const firestoreNews = firestoreNewsResult.status === "fulfilled" ? firestoreNewsResult.value : [];
+    const firestorePipelineReviews = firestorePipelineReviewsResult.status === "fulfilled" ? firestorePipelineReviewsResult.value : [];
     const staticContent = staticContentResult.status === "fulfilled"
       ? staticContentResult.value
       : { posts: [], guides: [], news: [] };
+    const reviewQueue = reviewQueueResult.status === "fulfilled" ? reviewQueueResult.value : [];
 
     setPosts(mergeItemsById(mergeArticleSets(firestorePosts, firestoreArticles), staticContent.posts));
     setGuides(mergeItemsById(firestoreGuides, staticContent.guides));
     setNews(mergeItemsById(firestoreNews, staticContent.news));
+    setPipelineItems(reviewQueue);
+    setPipelineStatuses(mapPipelineReviews(firestorePipelineReviews));
 
     const firestoreErrors = [
       firestorePostsResult,
       firestoreArticlesResult,
       firestoreGuidesResult,
       firestoreNewsResult,
+      firestorePipelineReviewsResult,
     ]
       .filter((result) => result.status === "rejected")
       .map((result) => result.reason);
@@ -691,6 +943,43 @@ export default function Admin() {
 
     setLoading(false);
   }, [user]);
+
+  const handleSetPipelineStatus = useCallback(async (id, status) => {
+    setActionError("");
+    try {
+      if (!status) {
+        await deletePipelineReview(id);
+        setPipelineStatuses((current) => {
+          const next = { ...current };
+          delete next[id];
+          return next;
+        });
+        return;
+      }
+
+      const nextStatus = {
+        status,
+        reviewerEmail: user?.email || null,
+        updatedAt: new Date().toISOString(),
+      };
+      await savePipelineReview(id, nextStatus);
+      setPipelineStatuses((current) => ({
+        ...current,
+        [String(id)]: { ...current[String(id)], ...nextStatus },
+      }));
+    } catch (e) {
+      setActionError(formatAdminError(e, user, "update pipeline review state"));
+    }
+  }, [user]);
+
+  const handleOpenPipelineDraft = useCallback((item) => {
+    if (!item?.draft) return;
+    if (item.kind === "news") {
+      setEditing({ type: "news", item: item.draft });
+      return;
+    }
+    setEditing({ type: "posts", item: { ...item.draft, _collection: "posts" } });
+  }, []);
 
   useEffect(() => {
     if (user) loadData();
@@ -762,6 +1051,7 @@ export default function Admin() {
     { key: "posts", label: "Posts" },
     { key: "guides", label: "Guides" },
     { key: "news", label: "News" },
+    { key: "pipeline", label: "Pipeline" },
     { key: "migrate", label: "Import" },
   ];
 
@@ -801,7 +1091,7 @@ export default function Admin() {
                   {t.label}
                   {t.key !== "migrate" && (
                     <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>
-                      {t.key === "posts" ? posts.length : t.key === "guides" ? guides.length : news.length}
+                      {t.key === "posts" ? posts.length : t.key === "guides" ? guides.length : t.key === "news" ? news.length : pipelineItems.length}
                     </span>
                   )}
                 </div>
@@ -827,6 +1117,14 @@ export default function Admin() {
                 onEdit={item => setEditing({ type: "news", item })}
                 onDelete={item => handleDelete("news", item)}
                 onCreate={() => setEditing({ type: "news", item: null })}
+              />
+            )}
+            {tab === "pipeline" && (
+              <PipelineReviewPanel
+                items={pipelineItems}
+                statuses={pipelineStatuses}
+                onSetStatus={handleSetPipelineStatus}
+                onOpenEditor={handleOpenPipelineDraft}
               />
             )}
             {tab === "migrate" && <MigrationPanel user={user} />}
