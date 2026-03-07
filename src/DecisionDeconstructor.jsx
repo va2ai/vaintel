@@ -5,7 +5,8 @@ import DOMPurify from 'dompurify';
 import { Layout } from './components/Layout.jsx';
 import './styles/publication.css';
 
-const CHAT_API = "/api/chat/message";
+const API_BASE = import.meta.env.VITE_API_BASE || "";
+const CHAT_API = `${API_BASE}/api/chat/message`;
 
 const ANALYSIS_PROMPT = `You are a VA claims decision analyst. I am pasting the following VA decision document for structured analysis.
 

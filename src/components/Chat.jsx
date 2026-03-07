@@ -3,7 +3,8 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { CloseIcon, SendIcon, BookIcon } from './icons.jsx';
 
-const CHAT_API = "/api/chat/message";
+const API_BASE = import.meta.env.VITE_API_BASE || "";
+const CHAT_API = `${API_BASE}/api/chat/message`;
 
 export function Chat({ contextTitle, contextType, contextText, suggestions }) {
   const [showChat, setShowChat] = useState(false);

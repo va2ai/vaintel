@@ -35,7 +35,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://vet-research-524576132881.us-central1.run.app',
+        target: 'https://vet-research-301313738047.us-central1.run.app',
         changeOrigin: true,
       }
     }
