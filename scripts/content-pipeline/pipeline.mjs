@@ -404,6 +404,17 @@ async function stageDraft(opts, dossier) {
     draft._sectionSummaries = summaries.sectionSummaries;
   }
 
+  // 2d. Generate hero image with Gemini when configured
+  log('Generating hero image...');
+  const heroImageResult = await runAgent('agents/hero-image-generator.mjs', ['--stdin'], draft, { timeout: 300_000 });
+  if (heroImageResult?.heroImage) {
+    draft.heroImage = heroImageResult.heroImage;
+    draft._heroImageGenerated = Boolean(heroImageResult.generated);
+    log(`Hero image ready: ${draft.heroImage}`);
+  } else {
+    log('Hero image generation skipped or failed; keeping existing heroImage path.');
+  }
+
   // Save draft
   const draftId = String(draft.id || Date.now()).padStart(3, '0');
   const draftPath = join(__dirname, `output/drafts/draft-${draftId}.json`);
