@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Veteran2Veteran (V2V) — a VA disability claims intelligence site for veterans. Provides articles, guides, news, AI-powered tools (BVA case search, Nexus Scout, VA Math Calculator), and a chat interface.
+Veteran2Veteran (V2V) — a VA disability claims intelligence site for veterans. Provides articles, guides, news, AI-powered tools (BVA case search, Nexus Scout, Decision Deconstructor, VA Math Calculator), and a chat interface.
 
 ## Commands
 
@@ -19,10 +19,11 @@ No test runner or linter is configured.
 ## Architecture
 
 **Routing:** `src/main.jsx` defines top-level routes via React Router:
-- `/bva` → `BvaSearch.jsx` (standalone page)
+- `/bva` → `BvaSearch.jsx` (standalone page, has back button to home)
 - `/nexus-scout` → `NexusScout.jsx` (standalone page)
 - `/admin` → `Admin.jsx` (standalone page)
 - `/pricing` → `PricingPage.jsx` (standalone page)
+- `/decision-deconstructor` → `DecisionDeconstructor.jsx` (Professional tier tool, uses Layout)
 - `/*` → `veteran2veteran-site.jsx` (main site, handles sub-routing internally)
 
 **Main site routing** (`veteran2veteran-site.jsx`): Uses `useLocation()` to match `/article/:id`, `/guide/:id`, `/section/:slug`, `/tools`, and `/` — all rendered within `<Layout>`. This is a single component that manages all homepage, article, guide, section, and news views via state.
@@ -42,7 +43,9 @@ No test runner or linter is configured.
 - Guides have `id`, `title`, `sections[]` (each with `heading` + `content` in markdown)
 - Posts now have explicit `section` field. `SECTION_MAP` in `veteran2veteran-site.jsx` provides fallback mapping from categories/tags to editorial sections: `va-policy`, `claims-strategy`, `cavc`, `explainers`, `opinion`
 
-**Chat:** `Chat.jsx` provides a contextual AI chat widget. Takes `contextTitle`, `contextType`, and `contextText` props. Backend proxied via Vite to `https://vet-research-524576132881.us-central1.run.app/api`.
+**Chat:** `Chat.jsx` provides a contextual AI chat widget. Takes `contextTitle`, `contextType`, and `contextText` props. In dev, Vite proxies `/api` to the backend. In production, calls the backend directly via hardcoded URL.
+
+**API Backend:** The backend (`vet-research`) is a separate repo (`va2ai/bvaopenai`) deployed as a Cloud Run service. Chat uses SSE streaming via `fetch` + `getReader()`.
 
 ## Project Structure
 
@@ -57,7 +60,28 @@ public/              # Static assets
 
 ## Deployment
 
-Push to `main` triggers GitHub Actions → builds → deploys to Firebase Hosting (project: `vaclaims-194006`). Firebase config requires secrets: `FIREBASE_SERVICE_ACCOUNT`, `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_MESSAGING_SENDER_ID`.
+### Frontend (Firebase Hosting)
+- **Project:** `vaclaims-194006`
+- **URL:** https://vaclaims-194006.web.app
+- GitHub Actions deploy is currently blocked (billing issue). Deploy manually:
+  ```bash
+  npm run build && npx firebase deploy --only hosting --project vaclaims-194006
+  ```
+- `firebase.json` has a `predeploy` that runs `npm run build` automatically on `firebase deploy`
+- Firebase config requires secrets: `FIREBASE_SERVICE_ACCOUNT`, `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_MESSAGING_SENDER_ID`
+
+### Backend (Cloud Run)
+- **Project:** `pro-habitat-485707-p7`
+- **Service:** `vet-research`
+- **URL:** https://vet-research-301313738047.us-central1.run.app
+- **GCP account:** `denvercombs@vaclaims.net`
+- Deploy: `cd C:/Users/ccdmn/code/researcher/opai && gcloud run deploy vet-research --source . --region us-central1 --project pro-habitat-485707-p7`
+- Env vars (API keys, CORS, etc.) set directly on Cloud Run service
+- CORS allows: `vaclaims-194006.web.app`, `vaclaims-194006.firebaseapp.com`, `localhost:5173`
+
+### BVA API (Cloud Run)
+- **Project:** `vaclaims-194006`
+- **URL:** https://bva-api-524576132881.us-central1.run.app
 
 ## Key Conventions
 
@@ -67,3 +91,4 @@ Push to `main` triggers GitHub Actions → builds → deploys to Firebase Hostin
 - `veteran2veteran-site.jsx` lives in `src/` (the main site component)
 - Product tiers: Free / Pro / Professional (see `docs/PRODUCT_CATALOG.md`)
 - Brand language and nav spec: `docs/BRAND_LANGUAGE_AND_NAV.md`
+- Production API URLs are hardcoded in components (`import.meta.env.DEV` check), not env vars, because firebase predeploy doesn't pass env vars
