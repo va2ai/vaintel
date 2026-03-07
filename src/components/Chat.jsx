@@ -3,7 +3,7 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { CloseIcon, SendIcon, BookIcon } from './icons.jsx';
 
-const API_BASE = import.meta.env.VITE_API_BASE || "";
+const API_BASE = import.meta.env.DEV ? "" : "https://vet-research-301313738047.us-central1.run.app";
 const CHAT_API = `${API_BASE}/api/chat/message`;
 
 export function Chat({ contextTitle, contextType, contextText, suggestions }) {
