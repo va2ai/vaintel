@@ -1,63 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Layout } from './components/Layout.jsx';
+import { TIERS } from './product-catalog.js';
+import { hasStripeCheckout, openStripeCheckout } from './billing.js';
 import './styles/publication.css';
-
-const TIERS = [
-  {
-    name: "Free",
-    price: "$0",
-    desc: "Learn the rules and start researching",
-    audience: "Veterans and first-time researchers",
-    color: "var(--gold-500)",
-    products: [
-      "Full publication access",
-      "Weekly Brief newsletter",
-      "BVA Decision Search",
-      "38 CFR Navigator",
-      "KnowVA / M21-1 Search",
-      "VA Math Calculator",
-      "CAVC Precedent Library",
-      "Nexus Scout Lite",
-    ],
-    cta: "Start Research",
-    ctaLink: "/tools",
-  },
-  {
-    name: "Pro",
-    price: "Coming Soon",
-    desc: "Build stronger claim strategy with deeper guided research",
-    audience: "Serious claimants and advanced researchers",
-    color: "#818cf8",
-    products: [
-      "Everything in Free",
-      "Claim Research Assistant",
-      "Nexus Scout Pro",
-      "CAVC Case Analyzer",
-      "Saved research sessions",
-      "Research packet export",
-    ],
-    cta: "Join Waitlist",
-    ctaLink: null,
-  },
-  {
-    name: "Professional",
-    price: "Coming Soon",
-    desc: "Analyze denials and accelerate professional-grade workflows",
-    audience: "Advocates, agents, and attorneys",
-    color: "#c084fc",
-    products: [
-      "Everything in Pro",
-      "Decision Deconstructor",
-      "Appeal Strategy Workbench",
-      "Attorney Research Mode",
-      "Advanced CAVC deep dive",
-      "Professional exports and reports",
-      "Higher usage limits",
-    ],
-    cta: "Join Waitlist",
-    ctaLink: null,
-  },
-];
 
 export default function PricingPage() {
   return (
@@ -109,7 +54,27 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              {tier.ctaLink ? (
+              {hasStripeCheckout(tier.slug) ? (
+                <button
+                  onClick={() => openStripeCheckout(tier.slug)}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    textAlign: "center",
+                    padding: "12px 24px",
+                    borderRadius: 8,
+                    background: tier.color,
+                    color: tier.slug === "free" ? "var(--navy-900)" : "white",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "'Source Sans 3'",
+                  }}
+                >
+                  {tier.slug === "pro" ? "Start Pro" : "Start Professional"}
+                </button>
+              ) : tier.slug === "free" && tier.ctaLink ? (
                 <Link to={tier.ctaLink} style={{
                   display: "block",
                   textAlign: "center",

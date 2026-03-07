@@ -42,6 +42,10 @@ function filterBySection(items, sectionSlug) {
   return items.filter(item => getSection(item) === sectionSlug);
 }
 
+function filterVisible(items) {
+  return (items || []).filter((item) => !item.hidden);
+}
+
 async function loadStaticContent() {
   const [postsRes, newsRes, guidesRes] = await Promise.all([
     fetch("/posts.json"),
@@ -95,16 +99,16 @@ export default function V2VSite() {
         ]);
 
         if (cancelled) return;
-        setPosts(postsData);
+        setPosts(filterVisible(postsData));
         setGuides(guidesData);
-        setNews(newsData);
+        setNews(filterVisible(newsData));
       } catch (firestoreError) {
         console.warn("Falling back to static content files:", firestoreError);
         try {
           const staticContent = await loadStaticContent();
           if (cancelled) return;
-          setPosts(staticContent.posts);
-          setNews(staticContent.news);
+          setPosts(filterVisible(staticContent.posts));
+          setNews(filterVisible(staticContent.news));
           setGuides(staticContent.guides);
         } catch (staticError) {
           console.error("Failed to load site content:", staticError);

@@ -147,6 +147,14 @@ function sanitizeFilename(str) {
     .slice(0, 60);
 }
 
+function resolveStyleProfile(articleType) {
+  const normalized = String(articleType || '').toLowerCase();
+  if (['cavc-analysis', 'policy-update', 'claims-strategy', 'explainer', 'opinion', 'news'].includes(normalized)) {
+    return normalized;
+  }
+  return 'claims-intel-default';
+}
+
 function hasUnverifiedCAVCClaim(text) {
   return /\bcavc\b/i.test(text || '') && /\b(ruling|decision|opinion|case)\b/i.test(text || '');
 }
@@ -823,6 +831,7 @@ function compileDossier(cluster) {
     veteranImpact: impact,
     suggestedArticleTypes: articleTypes,
     suggestedArticleType: articleTypes[0]?.type || 'explainer',
+    styleProfile: resolveStyleProfile(articleTypes[0]?.type),
     suggestedTitles: titleIdeas,
     keyQuestions,
     keywords,

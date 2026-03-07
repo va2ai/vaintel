@@ -1,0 +1,136 @@
+/* src/styles/admin.css */
+
+.admin-header {
+    background: #0d2240;
+    border-bottom: 1px solid #1a3a5c;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px;
+    }
+}
+
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 32px;
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 16px;
+    }
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admin-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .admin-grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admin-pipeline-grid {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .admin-pipeline-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #1a3a5c;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-item-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 600px) {
+    .admin-item-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-item-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+.admin-editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 12px;
+}
+
+@media (max-width: 600px) {
+    .admin-editor-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-editor-header-actions {
+        display: flex;
+        justify-content: stretch;
+    }
+
+    .admin-editor-header-actions>button {
+        flex: 1;
+    }
+}
+
+.admin-pipeline-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+    .admin-pipeline-actions>button {
+        flex: 1;
+        min-width: 120px;
+    }
+}

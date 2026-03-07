@@ -48,6 +48,7 @@ function isCanonicalDraftFile(fileName, draftId) {
 function buildReviewQueue() {
   const draftsDir = path.join(ROOT, "scripts", "content-pipeline", "output", "drafts");
   const qaDir = path.join(ROOT, "scripts", "content-pipeline", "output", "qa-reports");
+  const researchDir = path.join(ROOT, "scripts", "content-pipeline", "output", "research");
   const pubOut = path.join(ROOT, "public", "review-queue.json");
   const distOut = path.join(ROOT, "dist", "review-queue.json");
 
@@ -68,6 +69,19 @@ function buildReviewQueue() {
     })
     .filter(Boolean);
 
+  const researchPackets = fs.existsSync(researchDir)
+    ? fs.readdirSync(researchDir)
+        .filter((f) => f.endsWith(".json"))
+        .map((file) => {
+          const fullPath = path.join(researchDir, file);
+          const data = readJsonIfExists(fullPath);
+          if (!data) return null;
+          const stat = fs.statSync(fullPath);
+          return { file, fullPath, stat, data };
+        })
+        .filter(Boolean)
+    : [];
+
   const queueItems = draftFiles
     .map((file) => {
       const fullPath = path.join(draftsDir, file);
@@ -86,6 +100,9 @@ function buildReviewQueue() {
 
       const qa = matchingReports[0]?.data || null;
       const scorecard = qa?.scorecard || qa?.scorerResult?.scorecard || null;
+      const matchingPacket = researchPackets
+        .filter((packet) => packet.data?.dossierId && packet.data.dossierId === draft.researchPacketId)
+        .sort((a, b) => b.stat.mtimeMs - a.stat.mtimeMs)[0]?.data || null;
 
       return {
         id: draftId || path.basename(file, ".json"),
@@ -102,6 +119,7 @@ function buildReviewQueue() {
         createdAt: stat.mtime.toISOString(),
         titleAlternatives: draft._titleAlternatives || [],
         sectionSummaries: draft._sectionSummaries || [],
+        researchPacket: matchingPacket,
         draft,
         qa,
         scorecard,
@@ -150,6 +168,47 @@ function buildReviewQueue() {
   }
 }
 
+function buildResearchPackets() {
+  const researchDir = path.join(ROOT, "scripts", "content-pipeline", "output", "research");
+  const pubOut = path.join(ROOT, "public", "research-packets.json");
+  const distOut = path.join(ROOT, "dist", "research-packets.json");
+
+  const packetFiles = fs.existsSync(researchDir)
+    ? fs.readdirSync(researchDir).filter((f) => f.endsWith(".json"))
+    : [];
+
+  const packets = packetFiles
+    .map((file) => {
+      const fullPath = path.join(researchDir, file);
+      const packet = readJsonIfExists(fullPath);
+      if (!packet) return null;
+      const stat = fs.statSync(fullPath);
+      return {
+        dossierId: packet.dossierId,
+        compiledAt: packet.compiledAt || stat.mtime.toISOString(),
+        styleProfile: packet.styleProfile || null,
+        topic: packet.topic || null,
+        suggestedArticleType: packet.suggestedArticleType || null,
+        veteranImpact: packet.veteranImpact || null,
+        editorialWarnings: packet.editorialWarnings || [],
+        sourceCount: packet.sources?.length || 0,
+        draftable: true,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => String(b.compiledAt).localeCompare(String(a.compiledAt)));
+
+  const json = JSON.stringify(packets, null, 2) + "\n";
+  fs.writeFileSync(pubOut, json);
+  console.log(`[build] Wrote ${packets.length} research packets to public/research-packets.json`);
+
+  if (fs.existsSync(path.dirname(distOut))) {
+    fs.writeFileSync(distOut, json);
+    console.log("[build] Synced to dist/research-packets.json");
+  }
+}
+
 buildCollection("posts", (a, b) => b.id - a.id, "posts");
 buildCollection("guides", null, "guides");
+buildResearchPackets();
 buildReviewQueue();

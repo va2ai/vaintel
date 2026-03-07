@@ -6,10 +6,12 @@ import {
   savePost, saveArticle, saveGuide, saveNews,
   deletePost, deleteArticle, deleteGuide, deleteNewsItem,
   getPipelineReviews, savePipelineReview, deletePipelineReview,
+  getSubscriptions, saveSubscription,
   uploadImage,
 } from "./firestore.js";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
+import './styles/admin.css';
 
 // ── Allowed admin emails ─────────────────────────────────────
 const ADMIN_EMAILS = [
@@ -28,7 +30,7 @@ function isPermissionError(error) {
 function formatAdminError(error, user, action = "complete this action") {
   if (isPermissionError(error)) {
     const email = user?.email || "your signed-in account";
-    return `Firebase denied the write for ${email}. This admin UI is working, but your Firestore or Storage security rules do not allow this account to ${action}. Update the Firebase rules for the vaclaims-194006 project to allow the admin user to write posts, guides, news, pipelineReviews, and uploaded images.`;
+    return `Firebase denied the write for ${email}. This admin UI is working, but your Firestore or Storage security rules do not allow this account to ${action}. Update the Firebase rules for the vaclaims-194006 project to allow the admin user to write posts, guides, news, pipelineReviews, researchPackets, subscriptions, usageMeters, and uploaded images.`;
   }
   return error?.message || `Failed to ${action}.`;
 }
@@ -106,6 +108,7 @@ function mapPipelineReviews(items) {
 
 function getPipelineStatusMeta(status) {
   if (status === "approved") return { label: "Approved", background: "#1a4d35", color: "#9ce4b7" };
+  if (status === "published") return { label: "Published", background: "#1f4b45", color: "#9ce4da" };
   if (status === "needs_revision") return { label: "Needs Revision", background: "#4a3312", color: "#f3ce8d" };
   if (status === "rejected") return { label: "Rejected", background: "#4a1820", color: "#ffb4b4" };
   return { label: "Pending Review", background: "#1a3a5c", color: "#c9a84c" };
@@ -232,6 +235,8 @@ function PostEditor({ post, onSave, onCancel, user }) {
     whyItMatters: post?.whyItMatters || "",
     whatThisMeans: post?.whatThisMeans || "",
     sources: post?.sources || [],
+    hidden: post?.hidden || false,
+    _pipelineId: post?._pipelineId || null,
   });
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -249,9 +254,9 @@ function PostEditor({ post, onSave, onCancel, user }) {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      <div className="admin-editor-header">
         <h2 style={{ fontSize: 18, color: "#c9a84c" }}>{post ? "Edit Post" : "New Post"}</h2>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="admin-editor-header-actions" style={{ display: "flex", gap: 8 }}>
           <button onClick={() => setShowPreview(!showPreview)} style={{ ...S.btn, ...S.btnOutline }}>
             {showPreview ? "Editor" : "Preview"}
           </button>
@@ -269,7 +274,7 @@ function PostEditor({ post, onSave, onCancel, user }) {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={S.grid}>
+          <div className="admin-grid">
             <div>
               <label style={S.label}>Title</label>
               <input style={S.input} value={form.title} onChange={e => update("title", e.target.value)} />
@@ -279,7 +284,7 @@ function PostEditor({ post, onSave, onCancel, user }) {
               <input style={S.input} value={form.category} onChange={e => update("category", e.target.value)} />
             </div>
           </div>
-          <div style={S.grid}>
+          <div className="admin-grid">
             <div>
               <label style={S.label}>Editorial Section</label>
               <select style={S.input} value={form.section} onChange={e => update("section", e.target.value)}>
@@ -323,6 +328,10 @@ function PostEditor({ post, onSave, onCancel, user }) {
             <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#8aa3c8", cursor: "pointer" }}>
               <input type="checkbox" checked={form.isFeaturedHero} onChange={e => update("isFeaturedHero", e.target.checked)} />
               Homepage Hero
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#8aa3c8", cursor: "pointer" }}>
+              <input type="checkbox" checked={form.hidden} onChange={e => update("hidden", e.target.checked)} />
+              Hidden from public site
             </label>
           </div>
           <div>
@@ -391,9 +400,9 @@ function GuideEditor({ guide, onSave, onCancel, user }) {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      <div className="admin-editor-header">
         <h2 style={{ fontSize: 18, color: "#c9a84c" }}>{guide ? "Edit Guide" : "New Guide"}</h2>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="admin-editor-header-actions" style={{ display: "flex", gap: 8 }}>
           <button onClick={onCancel} style={{ ...S.btn, ...S.btnOutline }}>Cancel</button>
           <button onClick={handleSave} disabled={saving} style={{ ...S.btn, ...S.btnGold }}>
             {saving ? "Saving..." : "Save"}
@@ -402,7 +411,7 @@ function GuideEditor({ guide, onSave, onCancel, user }) {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <div style={S.grid}>
+        <div className="admin-grid">
           <div>
             <label style={S.label}>Guide ID (slug)</label>
             <input style={S.input} value={form.id} onChange={e => update("id", e.target.value)} disabled={!!guide} />
@@ -412,7 +421,7 @@ function GuideEditor({ guide, onSave, onCancel, user }) {
             <input style={S.input} value={form.title} onChange={e => update("title", e.target.value)} />
           </div>
         </div>
-        <div style={S.grid}>
+        <div className="admin-grid">
           <div>
             <label style={S.label}>Icon (emoji)</label>
             <input style={S.input} value={form.icon} onChange={e => update("icon", e.target.value)} />
@@ -493,6 +502,8 @@ function NewsEditor({ item, onSave, onCancel, user }) {
     heroImage: item?.heroImage || "",
     tags: item?.tags || [],
     relatedPostId: item?.relatedPostId || null,
+    hidden: item?.hidden || false,
+    _pipelineId: item?._pipelineId || null,
   });
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -510,9 +521,9 @@ function NewsEditor({ item, onSave, onCancel, user }) {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      <div className="admin-editor-header">
         <h2 style={{ fontSize: 18, color: "#c9a84c" }}>{item ? "Edit News" : "New News Item"}</h2>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="admin-editor-header-actions" style={{ display: "flex", gap: 8 }}>
           <button onClick={() => setShowPreview(!showPreview)} style={{ ...S.btn, ...S.btnOutline }}>
             {showPreview ? "Editor" : "Preview"}
           </button>
@@ -534,7 +545,7 @@ function NewsEditor({ item, onSave, onCancel, user }) {
             <label style={S.label}>Title</label>
             <input style={S.input} value={form.title} onChange={e => update("title", e.target.value)} />
           </div>
-          <div style={S.grid}>
+          <div className="admin-grid">
             <div>
               <label style={S.label}>Category</label>
               <input style={S.input} value={form.category} onChange={e => update("category", e.target.value)} />
@@ -544,7 +555,7 @@ function NewsEditor({ item, onSave, onCancel, user }) {
               <input style={S.input} value={form.date} onChange={e => update("date", e.target.value)} />
             </div>
           </div>
-          <div style={S.grid}>
+          <div className="admin-grid">
             <div>
               <label style={S.label}>Read Time</label>
               <input style={S.input} value={form.readTime} onChange={e => update("readTime", e.target.value)} />
@@ -565,9 +576,15 @@ function NewsEditor({ item, onSave, onCancel, user }) {
             storagePath={`images/news/${form.id}-hero.png`}
             user={user}
           />
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <input type="checkbox" checked={form.breaking} onChange={e => update("breaking", e.target.checked)} />
-            <span style={{ fontSize: 13, color: "#8aa3c8" }}>Breaking News</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#8aa3c8", cursor: "pointer" }}>
+              <input type="checkbox" checked={form.breaking} onChange={e => update("breaking", e.target.checked)} />
+              Breaking News
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#8aa3c8", cursor: "pointer" }}>
+              <input type="checkbox" checked={form.hidden} onChange={e => update("hidden", e.target.checked)} />
+              Hidden from public site
+            </label>
           </div>
           <div>
             <label style={S.label}>Body (Markdown)</label>
@@ -615,18 +632,26 @@ function ItemList({ items, type, onEdit, onDelete, onCreate }) {
 
 function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEditor }) {
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? null);
+  const [view, setView] = useState("active");
+
+  const filteredItems = items.filter((item) => {
+    const status = statuses[item.id]?.status || null;
+    if (view === "rejected") return status === "rejected";
+    if (view === "published") return status === "published";
+    return status !== "rejected" && status !== "published";
+  });
 
   useEffect(() => {
-    if (!items.length) {
+    if (!filteredItems.length) {
       setSelectedId(null);
       return;
     }
-    if (!items.some((item) => item.id === selectedId)) {
-      setSelectedId(items[0].id);
+    if (!filteredItems.some((item) => item.id === selectedId)) {
+      setSelectedId(filteredItems[0].id);
     }
-  }, [items, selectedId]);
+  }, [filteredItems, selectedId]);
 
-  const selected = items.find((item) => item.id === selectedId) || items[0] || null;
+  const selected = filteredItems.find((item) => item.id === selectedId) || filteredItems[0] || null;
   const selectedKey = selected ? String(selected.id) : null;
   const selectedStatusRecord = selected ? statuses[selected.id] : null;
   const selectedStatus = selectedStatusRecord?.status || null;
@@ -640,20 +665,25 @@ function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEdi
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 16, alignItems: "start" }}>
+      <div className="admin-pipeline-grid">
         <div>
           <div style={{ ...S.card, padding: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <span style={{ fontSize: 13, color: "#8aa3c8" }}>{items.length} pipeline drafts</span>
-              <button onClick={() => window.location.reload()} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Refresh</button>
+              <span style={{ fontSize: 13, color: "#8aa3c8" }}>{filteredItems.length} pipeline drafts</span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setView("active")} style={{ ...S.btn, ...(view === "active" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Active</button>
+                <button onClick={() => setView("published")} style={{ ...S.btn, ...(view === "published" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Published</button>
+                <button onClick={() => setView("rejected")} style={{ ...S.btn, ...(view === "rejected" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Rejected</button>
+                <button onClick={() => window.location.reload()} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Refresh</button>
+              </div>
             </div>
-            {!items.length && (
+            {!filteredItems.length && (
               <div style={{ color: "#8aa3c8", fontSize: 13, lineHeight: 1.6 }}>
-                No pipeline review items found. Run `node scripts/build-posts.cjs` after generating drafts.
+                No pipeline review items found in this view. Run `node scripts/build-posts.cjs` after generating drafts.
               </div>
             )}
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {items.map((item) => {
+              {filteredItems.map((item) => {
                 const statusMeta = getPipelineStatusMeta(statuses[item.id]?.status);
                 const isSelected = item.id === selected?.id;
                 return (
@@ -713,7 +743,7 @@ function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEdi
                   </span>
                 </div>
 
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+                <div className="admin-pipeline-actions">
                   <button disabled={savingId === selectedKey} onClick={() => onSetStatus(selected.id, "approved")} style={{ ...S.btn, ...S.btnGold, opacity: savingId === selectedKey ? 0.7 : 1 }}>Approve</button>
                   <button disabled={savingId === selectedKey} onClick={() => onSetStatus(selected.id, "needs_revision")} style={{ ...S.btn, background: "#5a3e18", color: "#f3d9a1", opacity: savingId === selectedKey ? 0.7 : 1 }}>Needs Revision</button>
                   <button disabled={savingId === selectedKey} onClick={() => onSetStatus(selected.id, "rejected")} style={{ ...S.btn, background: "#4a1820", color: "#ffb4b4", opacity: savingId === selectedKey ? 0.7 : 1 }}>Reject</button>
@@ -732,8 +762,14 @@ function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEdi
                     Reviewed by {selectedStatusRecord.reviewerEmail || "unknown"} {selectedStatusRecord.updatedAt ? `on ${new Date(selectedStatusRecord.updatedAt).toLocaleString()}` : ""}
                   </div>
                 )}
+                {selectedStatusRecord?.publishedDocId && (
+                  <div style={{ fontSize: 12, color: "#8aa3c8", marginBottom: 16 }}>
+                    Published to {selectedStatusRecord.publishedCollection}/{selectedStatusRecord.publishedDocId}
+                    {selectedStatusRecord.publishedAt ? ` on ${new Date(selectedStatusRecord.publishedAt).toLocaleString()}` : ""}
+                  </div>
+                )}
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                <div className="admin-grid-3">
                   <div style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 8, padding: 12 }}>
                     <div style={S.label}>Readiness</div>
                     <div style={{ fontSize: 18, fontWeight: 700 }}>{scorecard?.publishReadiness || "UNSCORED"}</div>
@@ -747,12 +783,15 @@ function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEdi
                   <div style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 8, padding: 12 }}>
                     <div style={S.label}>Draft ID</div>
                     <div style={{ fontSize: 18, fontWeight: 700 }}>{selected.id}</div>
-                    <div style={{ fontSize: 12, color: "#8aa3c8", marginTop: 6 }}>{selected.kind === "news" ? "News candidate" : "Post candidate"}</div>
+                    <div style={{ fontSize: 12, color: "#8aa3c8", marginTop: 6 }}>
+                      {selected.kind === "news" ? "News candidate" : "Post candidate"}
+                      {selected.draft?.styleProfile ? `  ${selected.draft.styleProfile}` : ""}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="admin-grid">
                 <div style={S.card}>
                   <div style={S.label}>Excerpt</div>
                   <div style={{ fontSize: 14, lineHeight: 1.7 }}>{selected.excerpt || "No excerpt."}</div>
@@ -760,6 +799,16 @@ function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEdi
                     <>
                       <div style={{ ...S.label, marginTop: 16 }}>Summary</div>
                       <div style={{ fontSize: 14, lineHeight: 1.7 }}>{selected.summary}</div>
+                    </>
+                  )}
+                  {selected.researchPacket && (
+                    <>
+                      <div style={{ ...S.label, marginTop: 16 }}>Research Packet</div>
+                      <div style={{ fontSize: 13, color: "#8aa3c8", lineHeight: 1.6 }}>
+                        {selected.researchPacket.topic?.title || "Untitled packet"}
+                        {selected.researchPacket.styleProfile ? `  ${selected.researchPacket.styleProfile}` : ""}
+                        {selected.researchPacket.sourceCount != null ? `  ${selected.researchPacket.sourceCount} sources` : ""}
+                      </div>
                     </>
                   )}
                   {!!selected.titleAlternatives?.length && (
@@ -872,6 +921,164 @@ function MigrationPanel({ user }) {
   );
 }
 
+function SubscriptionPanel({ subscriptions, onSave, saving, user }) {
+  const createEmptyForm = () => ({
+    uid: "",
+    email: "",
+    plan: "free",
+    status: "active",
+    stripeCustomerId: "",
+    stripeSubscriptionId: "",
+    source: "admin-manual",
+    currentPeriodEnd: "",
+    cancelAtPeriodEnd: false,
+  });
+  const [form, setForm] = useState(createEmptyForm);
+  const [localError, setLocalError] = useState("");
+
+  const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+
+  const submit = async () => {
+    setLocalError("");
+    if (!form.uid.trim()) {
+      setLocalError("UID is required.");
+      return;
+    }
+    if (!form.email.trim()) {
+      setLocalError("Email is required.");
+      return;
+    }
+    try {
+      await onSave({
+        ...form,
+        uid: form.uid.trim(),
+        email: form.email.trim(),
+        stripeCustomerId: form.stripeCustomerId.trim() || null,
+        stripeSubscriptionId: form.stripeSubscriptionId.trim() || null,
+        currentPeriodEnd: form.currentPeriodEnd.trim() || null,
+        reviewerEmail: user?.email || null,
+      });
+      setForm(createEmptyForm());
+    } catch (error) {
+      setLocalError(error?.message || "Failed to save subscription.");
+    }
+  };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "420px 1fr", gap: 16, alignItems: "start" }}>
+      <div style={S.card}>
+        <h2 style={{ fontSize: 18, color: "#c9a84c", margin: "0 0 16px" }}>Subscriptions</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={S.label}>Firebase UID</label>
+            <input style={S.input} value={form.uid} onChange={(e) => update("uid", e.target.value)} />
+          </div>
+          <div>
+            <label style={S.label}>Email</label>
+            <input style={S.input} value={form.email} onChange={(e) => update("email", e.target.value)} />
+          </div>
+          <div style={S.grid}>
+            <div>
+              <label style={S.label}>Plan</label>
+              <select style={S.input} value={form.plan} onChange={(e) => update("plan", e.target.value)}>
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+                <option value="professional">Professional</option>
+              </select>
+            </div>
+            <div>
+              <label style={S.label}>Status</label>
+              <select style={S.input} value={form.status} onChange={(e) => update("status", e.target.value)}>
+                <option value="active">Active</option>
+                <option value="trialing">Trialing</option>
+                <option value="past_due">Past Due</option>
+                <option value="canceled">Canceled</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style={S.label}>Stripe Customer ID</label>
+            <input style={S.input} value={form.stripeCustomerId} onChange={(e) => update("stripeCustomerId", e.target.value)} placeholder="cus_..." />
+          </div>
+          <div>
+            <label style={S.label}>Stripe Subscription ID</label>
+            <input style={S.input} value={form.stripeSubscriptionId} onChange={(e) => update("stripeSubscriptionId", e.target.value)} placeholder="sub_..." />
+          </div>
+          <div style={S.grid}>
+            <div>
+              <label style={S.label}>Source</label>
+              <input style={S.input} value={form.source} onChange={(e) => update("source", e.target.value)} />
+            </div>
+            <div>
+              <label style={S.label}>Current Period End</label>
+              <input style={S.input} value={form.currentPeriodEnd} onChange={(e) => update("currentPeriodEnd", e.target.value)} placeholder="2026-04-07T00:00:00Z" />
+            </div>
+          </div>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#8aa3c8", cursor: "pointer" }}>
+            <input type="checkbox" checked={form.cancelAtPeriodEnd} onChange={(e) => update("cancelAtPeriodEnd", e.target.checked)} />
+            Cancel at period end
+          </label>
+          <button onClick={submit} disabled={saving} style={{ ...S.btn, ...S.btnGold }}>
+            {saving ? "Saving..." : "Save Subscription"}
+          </button>
+          <button onClick={() => setForm(createEmptyForm())} disabled={saving} style={{ ...S.btn, ...S.btnOutline }}>
+            Clear
+          </button>
+          {localError && <div style={{ color: "#ffb4b4", fontSize: 12 }}>{localError}</div>}
+        </div>
+      </div>
+
+      <div style={S.card}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <h3 style={{ fontSize: 16, color: "#c9a84c", margin: 0 }}>Current Subscription Records</h3>
+          <span style={{ fontSize: 12, color: "#8aa3c8" }}>{subscriptions.length} records</span>
+        </div>
+        {!subscriptions.length && (
+          <div style={{ fontSize: 13, color: "#8aa3c8" }}>
+            No subscription records yet. Stripe checkout can still be used, but plan access remains free until a record is created.
+          </div>
+        )}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {subscriptions.map((subscription) => (
+            <div key={subscription._id} style={{ background: "#091729", border: "1px solid #1a3a5c", borderRadius: 8, padding: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
+                <div style={{ fontWeight: 600 }}>{subscription.email || subscription._id}</div>
+                <span style={{ ...S.badge, background: "#152f4f", color: "#d8c18c" }}>{subscription.plan || "free"}</span>
+              </div>
+              <div style={{ fontSize: 12, color: "#8aa3c8", lineHeight: 1.6 }}>
+                {subscription._id}
+                {subscription.status ? `  ${subscription.status}` : ""}
+                {subscription.currentPeriodEnd ? `  ${subscription.currentPeriodEnd}` : ""}
+              </div>
+              {(subscription.stripeCustomerId || subscription.stripeSubscriptionId) && (
+                <div style={{ fontSize: 12, color: "#8aa3c8", marginTop: 6, lineHeight: 1.6 }}>
+                  {subscription.stripeCustomerId || "No customer"} {subscription.stripeSubscriptionId ? `  ${subscription.stripeSubscriptionId}` : ""}
+                </div>
+              )}
+              <button
+                onClick={() => setForm({
+                  uid: subscription._id,
+                  email: subscription.email || "",
+                  plan: subscription.plan || "free",
+                  status: subscription.status || "active",
+                  stripeCustomerId: subscription.stripeCustomerId || "",
+                  stripeSubscriptionId: subscription.stripeSubscriptionId || "",
+                  source: subscription.source || "admin-manual",
+                  currentPeriodEnd: subscription.currentPeriodEnd || "",
+                  cancelAtPeriodEnd: Boolean(subscription.cancelAtPeriodEnd),
+                })}
+                style={{ ...S.btn, ...S.btnOutline, fontSize: 11, marginTop: 10 }}
+              >
+                Edit
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Admin Component ─────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState(null);
@@ -880,9 +1087,11 @@ export default function Admin() {
   const [posts, setPosts] = useState([]);
   const [guides, setGuides] = useState([]);
   const [news, setNews] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
   const [pipelineItems, setPipelineItems] = useState([]);
   const [pipelineStatuses, setPipelineStatuses] = useState({});
   const [pipelineSavingId, setPipelineSavingId] = useState(null);
+  const [subscriptionSaving, setSubscriptionSaving] = useState(false);
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -903,14 +1112,16 @@ export default function Admin() {
       firestoreGuidesResult,
       firestoreNewsResult,
       firestorePipelineReviewsResult,
+      firestoreSubscriptionsResult,
       staticContentResult,
       reviewQueueResult,
     ] = await Promise.allSettled([
-      getPosts(),
+      getPosts(true),
       getArticles(),
       getGuides(),
-      getNews(),
+      getNews(true),
       getPipelineReviews(),
+      getSubscriptions(),
       loadStaticAdminContent(),
       loadReviewQueue(),
     ]);
@@ -920,6 +1131,7 @@ export default function Admin() {
     const firestoreGuides = firestoreGuidesResult.status === "fulfilled" ? firestoreGuidesResult.value : [];
     const firestoreNews = firestoreNewsResult.status === "fulfilled" ? firestoreNewsResult.value : [];
     const firestorePipelineReviews = firestorePipelineReviewsResult.status === "fulfilled" ? firestorePipelineReviewsResult.value : [];
+    const firestoreSubscriptions = firestoreSubscriptionsResult.status === "fulfilled" ? firestoreSubscriptionsResult.value : [];
     const staticContent = staticContentResult.status === "fulfilled"
       ? staticContentResult.value
       : { posts: [], guides: [], news: [] };
@@ -928,6 +1140,7 @@ export default function Admin() {
     setPosts(mergeItemsById(mergeArticleSets(firestorePosts, firestoreArticles), staticContent.posts));
     setGuides(mergeItemsById(firestoreGuides, staticContent.guides));
     setNews(mergeItemsById(firestoreNews, staticContent.news));
+    setSubscriptions(firestoreSubscriptions);
     setPipelineItems(reviewQueue);
     setPipelineStatuses(mapPipelineReviews(firestorePipelineReviews));
 
@@ -937,6 +1150,7 @@ export default function Admin() {
       firestoreGuidesResult,
       firestoreNewsResult,
       firestorePipelineReviewsResult,
+      firestoreSubscriptionsResult,
     ]
       .filter((result) => result.status === "rejected")
       .map((result) => result.reason);
@@ -949,6 +1163,18 @@ export default function Admin() {
     }
 
     setLoading(false);
+  }, [user]);
+
+  const persistPublishedPipelineState = useCallback(async (pipelineId, publishedCollection, publishedDocId) => {
+    if (!pipelineId) return;
+    await savePipelineReview(pipelineId, {
+      status: "published",
+      reviewerEmail: user?.email || null,
+      publishedCollection,
+      publishedDocId: String(publishedDocId),
+      publishedAt: new Date().toISOString(),
+      hidden: false,
+    });
   }, [user]);
 
   const handleSetPipelineStatus = useCallback(async (id, status) => {
@@ -977,11 +1203,24 @@ export default function Admin() {
       }
 
       const nextStatus = {
+        ...previousStatus,
         status,
         reviewerEmail: user?.email || null,
         updatedAt: new Date().toISOString(),
       };
+      if (status === "rejected" && previousStatus?.publishedCollection && previousStatus?.publishedDocId) {
+        const hiddenPayload = { hidden: true };
+        if (previousStatus.publishedCollection === "news") {
+          await saveNews(previousStatus.publishedDocId, hiddenPayload);
+        } else if (previousStatus.publishedCollection === "articles") {
+          await saveArticle(previousStatus.publishedDocId, hiddenPayload);
+        } else {
+          await savePost(previousStatus.publishedDocId, hiddenPayload);
+        }
+        nextStatus.hidden = true;
+      }
       await savePipelineReview(id, nextStatus);
+      await loadData();
     } catch (e) {
       setPipelineStatuses((current) => {
         const next = { ...current };
@@ -993,15 +1232,15 @@ export default function Admin() {
     } finally {
       setPipelineSavingId(null);
     }
-  }, [pipelineStatuses, user]);
+  }, [loadData, pipelineStatuses, user]);
 
   const handleOpenPipelineDraft = useCallback((item) => {
     if (!item?.draft) return;
     if (item.kind === "news") {
-      setEditing({ type: "news", item: item.draft });
+      setEditing({ type: "news", item: { ...item.draft, _pipelineId: item.id } });
       return;
     }
-    setEditing({ type: "posts", item: { ...item.draft, _collection: "posts" } });
+    setEditing({ type: "posts", item: { ...item.draft, _collection: "posts", _pipelineId: item.id } });
   }, []);
 
   useEffect(() => {
@@ -1021,10 +1260,13 @@ export default function Admin() {
     try {
       const collection = resolveArticleCollection(form);
       const payload = { ...form };
+      const pipelineId = payload._pipelineId;
       delete payload._collection;
       delete payload._id;
+      delete payload._pipelineId;
       if (collection === "articles") await saveArticle(String(form.id), payload);
       else await savePost(String(form.id), payload);
+      await persistPublishedPipelineState(pipelineId, collection, form.id);
       setEditing(null);
       await loadData();
     } catch (e) {
@@ -1046,11 +1288,38 @@ export default function Admin() {
   const handleSaveNews = async (form) => {
     setActionError("");
     try {
-      await saveNews(form.id, form);
+      const payload = { ...form };
+      const pipelineId = payload._pipelineId;
+      delete payload._pipelineId;
+      await saveNews(form.id, payload);
+      await persistPublishedPipelineState(pipelineId, "news", form.id);
       setEditing(null);
       await loadData();
     } catch (e) {
       setActionError(formatAdminError(e, user, "save news"));
+    }
+  };
+
+  const handleSaveSubscription = async (form) => {
+    setActionError("");
+    setSubscriptionSaving(true);
+    try {
+      await saveSubscription(form.uid, {
+        email: form.email,
+        plan: form.plan,
+        status: form.status,
+        stripeCustomerId: form.stripeCustomerId,
+        stripeSubscriptionId: form.stripeSubscriptionId,
+        source: form.source,
+        currentPeriodEnd: form.currentPeriodEnd,
+        cancelAtPeriodEnd: Boolean(form.cancelAtPeriodEnd),
+      });
+      await loadData();
+    } catch (e) {
+      setActionError(formatAdminError(e, user, "save subscriptions"));
+      throw e;
+    } finally {
+      setSubscriptionSaving(false);
     }
   };
 
@@ -1075,12 +1344,13 @@ export default function Admin() {
     { key: "guides", label: "Guides" },
     { key: "news", label: "News" },
     { key: "pipeline", label: "Pipeline" },
+    { key: "subscriptions", label: "Subscriptions" },
     { key: "migrate", label: "Import" },
   ];
 
   return (
     <div style={S.page}>
-      <header style={S.header}>
+      <header className="admin-header">
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={S.title}>V2V Admin</span>
           {loading && <span style={{ fontSize: 11, color: "#8aa3c8" }}>Loading...</span>}
@@ -1091,7 +1361,7 @@ export default function Admin() {
         </div>
       </header>
 
-      <div style={S.container}>
+      <div className="admin-container">
         {actionError && (
           <div style={{ ...S.card, border: "1px solid #6b2a34", background: "#2a1520", color: "#ffb4b4", marginBottom: 20 }}>
             {actionError}
@@ -1107,14 +1377,22 @@ export default function Admin() {
           )
         ) : (
           <>
-            <div style={S.tabs}>
+            <div className="admin-tabs">
               {TABS.map(t => (
                 <div key={t.key} onClick={() => setTab(t.key)}
                   style={{ ...S.tab, ...(tab === t.key ? S.tabActive : {}) }}>
                   {t.label}
                   {t.key !== "migrate" && (
                     <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>
-                      {t.key === "posts" ? posts.length : t.key === "guides" ? guides.length : t.key === "news" ? news.length : pipelineItems.length}
+                      {t.key === "posts"
+                        ? posts.length
+                        : t.key === "guides"
+                          ? guides.length
+                          : t.key === "news"
+                            ? news.length
+                            : t.key === "subscriptions"
+                              ? subscriptions.length
+                              : pipelineItems.length}
                     </span>
                   )}
                 </div>
@@ -1149,6 +1427,14 @@ export default function Admin() {
                 savingId={pipelineSavingId}
                 onSetStatus={handleSetPipelineStatus}
                 onOpenEditor={handleOpenPipelineDraft}
+              />
+            )}
+            {tab === "subscriptions" && (
+              <SubscriptionPanel
+                subscriptions={subscriptions}
+                onSave={handleSaveSubscription}
+                saving={subscriptionSaving}
+                user={user}
               />
             )}
             {tab === "migrate" && <MigrationPanel user={user} />}

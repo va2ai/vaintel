@@ -49,6 +49,16 @@ function calculateReadTime(body, wpm = 250) {
   return `${Math.ceil(words / wpm)} min`;
 }
 
+function mergeProfile(baseGuide, profileConfig, profileKey) {
+  if (!profileConfig?.profiles) return { ...baseGuide };
+  const resolvedKey = profileConfig.profiles[profileKey] ? profileKey : profileConfig.defaultProfile;
+  return {
+    ...baseGuide,
+    activeProfile: resolvedKey,
+    profileSettings: profileConfig.profiles[resolvedKey] || null,
+  };
+}
+
 function formatDate(d = new Date()) {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
@@ -204,8 +214,9 @@ async function main() {
   }
 
   // Load config files
-  log('Loading style guide and content schemas...');
-  const styleGuide = await loadJSON(join(ROOT, 'config', 'style-guide.json'));
+  log('Loading style guide, style profiles, and content schemas...');
+  const styleGuideBase = await loadJSON(join(ROOT, 'config', 'style-guide.json'));
+  const styleProfiles = await loadJSON(join(ROOT, 'config', 'style-profiles.json'));
   const contentSchemas = await loadJSON(join(ROOT, 'config', 'content-schemas.json'));
 
   // Load research dossier from stdin or file
@@ -219,6 +230,10 @@ async function main() {
   } else {
     fatal('No dossier provided. Use --stdin or provide a file path.');
   }
+
+  const styleProfile = dossier.styleProfile || articleType;
+  const styleGuide = mergeProfile(styleGuideBase, styleProfiles, styleProfile);
+  dossier.styleProfileResolved = styleGuide.activeProfile;
 
   // Determine temperature from schema
   const typeConfig = contentSchemas.contentTypes[articleType];
@@ -261,6 +276,9 @@ async function main() {
       draft.heroImage = `/images/post-${slugify(draft.title)}-hero.png`;
     }
   }
+
+  draft.styleProfile = dossier.styleProfileResolved || styleProfile;
+  draft.researchPacketId = dossier.dossierId || null;
 
   // Save to output/drafts/
   const outputDir = join(ROOT, 'output', 'drafts');

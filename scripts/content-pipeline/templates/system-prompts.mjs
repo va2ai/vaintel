@@ -71,6 +71,24 @@ function renderWordChoiceRules(styleGuide) {
   return lines.join('\n');
 }
 
+function renderStyleProfile(styleGuide) {
+  const profile = styleGuide.profileSettings;
+  if (!profile) return '';
+
+  const lines = [
+    `STYLE PROFILE: ${profile.label || styleGuide.activeProfile}`,
+    `EDITORIAL INTENT: ${profile.editorialIntent}`,
+    `TONE EMPHASIS: ${profile.toneEmphasis}`,
+    '',
+    'PROFILE MUST-DO RULES:',
+    ...(profile.mustDo || []).map((item) => `- ${item}`),
+    '',
+    'PROFILE AVOID RULES:',
+    ...(profile.avoid || []).map((item) => `- ${item}`),
+  ];
+  return lines.join('\n');
+}
+
 /**
  * Render article-type-specific guidelines.
  */
@@ -169,6 +187,9 @@ ${renderFormattingRules(styleGuide)}
 === WORD CHOICE AND TERMINOLOGY ===
 ${renderWordChoiceRules(styleGuide)}
 
+=== STYLE PROFILE ===
+${renderStyleProfile(styleGuide)}
+
 === ARTICLE TYPE GUIDELINES ===
 ${renderArticleTypeGuidelines(styleGuide, articleType)}
 
@@ -239,6 +260,9 @@ ${renderFormattingRules(styleGuide)}
 
 === WORD CHOICE AND TERMINOLOGY ===
 ${renderWordChoiceRules(styleGuide)}
+
+=== STYLE PROFILE ===
+${renderStyleProfile(styleGuide)}
 
 === ARTICLE TYPE GUIDELINES ===
 ${renderArticleTypeGuidelines(styleGuide, 'news')}

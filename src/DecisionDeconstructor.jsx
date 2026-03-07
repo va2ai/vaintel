@@ -1,8 +1,11 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { Layout } from './components/Layout.jsx';
+import { useAccess } from './access.js';
+import { getTool, getTier } from './product-catalog.js';
+import { hasStripeCheckout, openStripeCheckout } from './billing.js';
 import './styles/publication.css';
 
 const API_BASE = import.meta.env.DEV ? "" : "https://vet-research-301313738047.us-central1.run.app";
@@ -51,6 +54,14 @@ function renderMarkdown(text) {
   return { __html: DOMPurify.sanitize(marked.parse(text)) };
 }
 
+const TOOL = getTool("decision-deconstructor");
+
+function formatUsage(toolAccess, plan) {
+  if (!toolAccess) return "";
+  if (toolAccess.limit == null) return `${getTier(plan).name} access`;
+  return `${toolAccess.used}/${toolAccess.limit} ${TOOL?.meter?.label || "runs"}`;
+}
+
 export default function DecisionDeconstructor() {
   const [decisionText, setDecisionText] = useState("");
   const [analysisResult, setAnalysisResult] = useState("");
@@ -59,6 +70,9 @@ export default function DecisionDeconstructor() {
   const [inputMode, setInputMode] = useState("paste"); // paste or upload
   const streamRef = useRef("");
   const abortRef = useRef(null);
+  const { user, loading, plan, toolAccess, signIn, signOutUser, consumeUsage } = useAccess("decision-deconstructor");
+  const planMeta = useMemo(() => getTier(plan), [plan]);
+  const executionBlocked = !user || !toolAccess?.canRun;
 
   const handleFileUpload = useCallback((e) => {
     const file = e.target.files?.[0];
@@ -73,6 +87,14 @@ export default function DecisionDeconstructor() {
 
   const analyzeDecision = useCallback(async () => {
     if (!decisionText.trim() || isAnalyzing) return;
+    if (!user) {
+      setError("Sign in to run Decision Deconstructor.");
+      return;
+    }
+    if (!toolAccess?.canRun) {
+      setError(`No remaining ${TOOL?.meter?.label || "usage"} for your ${planMeta.name} plan.`);
+      return;
+    }
 
     setIsAnalyzing(true);
     setError(null);
@@ -96,6 +118,8 @@ export default function DecisionDeconstructor() {
         const errText = await res.text();
         throw new Error(errText.substring(0, 200));
       }
+
+      await consumeUsage({ route: "decision-deconstructor", wordCount: decisionText.trim().split(/\s+/).filter(Boolean).length });
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -134,7 +158,7 @@ export default function DecisionDeconstructor() {
       setIsAnalyzing(false);
       abortRef.current = null;
     }
-  }, [decisionText, isAnalyzing]);
+  }, [consumeUsage, decisionText, isAnalyzing, planMeta.name, toolAccess?.canRun, user]);
 
   const stopAnalysis = useCallback(() => {
     abortRef.current?.abort();
@@ -165,6 +189,120 @@ export default function DecisionDeconstructor() {
             Paste or upload a VA decision letter. The analysis extracts favorable findings, identifies denial basis by issue, maps evidence gaps, and recommends next steps grounded in 38 CFR and CAVC precedent.
           </p>
         </div>
+
+        <div style={{
+          marginBottom: 24,
+          padding: "18px 20px",
+          borderRadius: 10,
+          border: "1px solid var(--cream-border)",
+          background: "var(--cream-bg)",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 16,
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}>
+          <div>
+            <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-muted)", marginBottom: 6 }}>
+              Access
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>
+              {loading ? "Checking access..." : `${planMeta.name} plan`}
+            </div>
+            <div style={{ fontSize: 13, color: "var(--ink-light)", marginTop: 4 }}>
+              {loading ? "Loading account state" : formatUsage(toolAccess, plan)}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {!user ? (
+              <button
+                onClick={signIn}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "var(--navy-900)",
+                  color: "white",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "'Source Sans 3'",
+                }}
+              >
+                Sign In to Run
+              </button>
+            ) : (
+              <button
+                onClick={signOutUser}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                  border: "1px solid var(--cream-border)",
+                  background: "transparent",
+                  color: "var(--ink-light)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "'Source Sans 3'",
+                }}
+              >
+                Sign Out
+              </button>
+            )}
+            {hasStripeCheckout("professional") ? (
+              <button
+                onClick={() => openStripeCheckout("professional")}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                  border: "1px solid rgba(168,85,247,0.25)",
+                  background: "rgba(168,85,247,0.08)",
+                  color: "#7c3aed",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "'Source Sans 3'",
+                }}
+              >
+                Upgrade Access
+              </button>
+            ) : (
+              <Link
+                to="/pricing"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                  border: "1px solid rgba(168,85,247,0.25)",
+                  background: "rgba(168,85,247,0.08)",
+                  color: "#7c3aed",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  fontFamily: "'Source Sans 3'",
+                }}
+              >
+                Upgrade Access
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {!user && (
+          <div style={{
+            marginBottom: 24,
+            padding: "16px 18px",
+            borderRadius: 8,
+            background: "rgba(124,58,237,0.08)",
+            border: "1px solid rgba(124,58,237,0.18)",
+            color: "var(--ink)",
+            fontSize: 14,
+            lineHeight: 1.6,
+          }}>
+            Decision Deconstructor is the flagship denial-analysis workflow. The page stays public, but execution requires sign-in and is usage-metered by plan.
+          </div>
+        )}
 
         {/* Input Section */}
         {!analysisResult && !isAnalyzing && (
@@ -245,16 +383,16 @@ export default function DecisionDeconstructor() {
               </span>
               <button
                 onClick={analyzeDecision}
-                disabled={!decisionText.trim()}
+                disabled={!decisionText.trim() || executionBlocked}
                 style={{
                   padding: "12px 28px", borderRadius: 8, border: "none",
-                  background: decisionText.trim() ? "var(--gold-500)" : "var(--cream-border)",
-                  color: decisionText.trim() ? "var(--navy-900)" : "var(--ink-muted)",
-                  fontWeight: 700, fontSize: 15, cursor: decisionText.trim() ? "pointer" : "default",
+                  background: decisionText.trim() && !executionBlocked ? "var(--gold-500)" : "var(--cream-border)",
+                  color: decisionText.trim() && !executionBlocked ? "var(--navy-900)" : "var(--ink-muted)",
+                  fontWeight: 700, fontSize: 15, cursor: decisionText.trim() && !executionBlocked ? "pointer" : "default",
                   fontFamily: "'Source Sans 3'"
                 }}
               >
-                Analyze Decision
+                {!user ? "Sign In to Analyze" : toolAccess?.canRun ? "Analyze Decision" : "Upgrade to Continue"}
               </button>
             </div>
           </div>

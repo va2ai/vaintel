@@ -2,6 +2,7 @@ import { lazyDb, lazyStorage } from "./firebase.js";
 import {
   collection, doc, getDocs, getDoc, setDoc, deleteDoc, addDoc,
   serverTimestamp,
+  increment,
 } from "firebase/firestore";
 import {
   ref, uploadBytes, getDownloadURL, deleteObject,
@@ -14,6 +15,9 @@ const GUIDES = "guides";
 const NEWS = "news";
 const SUBSCRIBERS = "subscribers";
 const PIPELINE_REVIEWS = "pipelineReviews";
+const RESEARCH_PACKETS = "researchPackets";
+const SUBSCRIPTIONS = "subscriptions";
+const USAGE_METERS = "usageMeters";
 
 function compareDesc(a, b) {
   if (a === b) return 0;
@@ -29,9 +33,14 @@ async function getCollectionDocs(name, sortField) {
   return docs.sort((a, b) => compareDesc(a[sortField], b[sortField]));
 }
 
+function hideFiltered(items, includeHidden = false) {
+  if (includeHidden) return items;
+  return items.filter((item) => !item.hidden);
+}
+
 // ── Read ─────────────────────────────────────────────────────
-export async function getPosts() {
-  return getCollectionDocs(POSTS, "date");
+export async function getPosts(includeHidden = false) {
+  return hideFiltered(await getCollectionDocs(POSTS, "date"), includeHidden);
 }
 
 export async function getArticles() {
@@ -42,12 +51,30 @@ export async function getGuides() {
   return getCollectionDocs(GUIDES);
 }
 
-export async function getNews() {
-  return getCollectionDocs(NEWS, "timestamp");
+export async function getNews(includeHidden = false) {
+  return hideFiltered(await getCollectionDocs(NEWS, "timestamp"), includeHidden);
 }
 
 export async function getPipelineReviews() {
   return getCollectionDocs(PIPELINE_REVIEWS, "updatedAt");
+}
+
+export async function getResearchPackets() {
+  return getCollectionDocs(RESEARCH_PACKETS, "compiledAt");
+}
+
+export async function getSubscription(uid) {
+  const snap = await getDoc(doc(lazyDb(), SUBSCRIPTIONS, String(uid)));
+  return snap.exists() ? { ...snap.data(), _id: snap.id } : null;
+}
+
+export async function getSubscriptions() {
+  return getCollectionDocs(SUBSCRIPTIONS, "updatedAt");
+}
+
+export async function getUsageMeter(uid, monthKey) {
+  const snap = await getDoc(doc(lazyDb(), USAGE_METERS, `${uid}_${monthKey}`));
+  return snap.exists() ? { ...snap.data(), _id: snap.id } : null;
 }
 
 export async function getPost(id) {
@@ -80,6 +107,31 @@ export async function saveNews(id, data) {
 export async function savePipelineReview(id, data) {
   await setDoc(doc(lazyDb(), PIPELINE_REVIEWS, String(id)), {
     ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export async function saveResearchPacket(id, data) {
+  await setDoc(doc(lazyDb(), RESEARCH_PACKETS, String(id)), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export async function saveSubscription(uid, data) {
+  await setDoc(doc(lazyDb(), SUBSCRIPTIONS, String(uid)), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export async function incrementUsageMeter(uid, monthKey, toolSlug, meta = {}) {
+  await setDoc(doc(lazyDb(), USAGE_METERS, `${uid}_${monthKey}`), {
+    uid,
+    monthKey,
+    [`tools.${toolSlug}`]: increment(1),
+    lastTool: toolSlug,
+    lastRunMeta: meta,
     updatedAt: serverTimestamp(),
   }, { merge: true });
 }

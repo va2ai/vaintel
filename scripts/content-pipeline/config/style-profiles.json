@@ -1,0 +1,98 @@
+{
+  "defaultProfile": "claims-intel-default",
+  "profiles": {
+    "claims-intel-default": {
+      "label": "Claims Intel Default",
+      "editorialIntent": "Fast, credible claims intelligence for veterans reading on mobile.",
+      "toneEmphasis": "Lead with the practical consequence before the background.",
+      "mustDo": [
+        "Anchor every major claim to a regulation, case, policy memo, or docket-supported fact.",
+        "Translate legal jargon into plain English the first time it appears.",
+        "Keep paragraphs short and make next steps explicit."
+      ],
+      "avoid": [
+        "Long legal-history detours before explaining why the issue matters now.",
+        "Unnamed court-ruling framing when the dossier lacks a verified case."
+      ]
+    },
+    "cavc-analysis": {
+      "label": "CAVC Analysis",
+      "editorialIntent": "Case-driven appellate analysis for veterans, advocates, and attorneys.",
+      "toneEmphasis": "Precise, citation-heavy, and careful about the actual holding.",
+      "mustDo": [
+        "Name the case and docket when verified.",
+        "Separate the holding from dicta and downstream strategy.",
+        "Explain how the Board or VA is likely to apply the decision."
+      ],
+      "avoid": [
+        "Overstating what the court decided.",
+        "Turning one case into a universal promise."
+      ]
+    },
+    "policy-update": {
+      "label": "Policy Update",
+      "editorialIntent": "Explain what changed, who it affects, and what to do now.",
+      "toneEmphasis": "Urgent where necessary, but procedural and concrete.",
+      "mustDo": [
+        "Show the before-versus-after change.",
+        "Call out timing, deadlines, and affected cohorts.",
+        "Link the change to actual filing or appeal behavior."
+      ],
+      "avoid": [
+        "Generic bureaucratic summaries with no practical takeaway."
+      ]
+    },
+    "claims-strategy": {
+      "label": "Claims Strategy",
+      "editorialIntent": "Turn doctrine and evidence rules into an executable filing strategy.",
+      "toneEmphasis": "Tactical, empowering, and step-driven.",
+      "mustDo": [
+        "Spell out the evidence sequence.",
+        "Show the likely VA weak point in the claim.",
+        "End with specific action items."
+      ],
+      "avoid": [
+        "Abstract advice with no filing or evidence order."
+      ]
+    },
+    "explainer": {
+      "label": "Explainer",
+      "editorialIntent": "Teach the rule clearly enough that the reader can use it on a live claim.",
+      "toneEmphasis": "Patient and plain-language without dumbing it down.",
+      "mustDo": [
+        "Define the rule or concept early.",
+        "Use examples or scenarios.",
+        "Correct common misconceptions."
+      ],
+      "avoid": [
+        "Assuming the reader already knows VA terminology."
+      ]
+    },
+    "opinion": {
+      "label": "Opinion",
+      "editorialIntent": "Make a sharp case while staying grounded in evidence.",
+      "toneEmphasis": "Opinionated, but disciplined and sourced.",
+      "mustDo": [
+        "State the thesis early.",
+        "Support assertions with real cases, regs, or data.",
+        "Acknowledge the strongest counterargument."
+      ],
+      "avoid": [
+        "Pure ranting or vague outrage."
+      ]
+    },
+    "news": {
+      "label": "News",
+      "editorialIntent": "Deliver the event quickly, then explain why veterans should care.",
+      "toneEmphasis": "Tight, factual, and current.",
+      "mustDo": [
+        "State what happened in the first paragraph.",
+        "Identify the affected population.",
+        "Say whether the reader needs to act now."
+      ],
+      "avoid": [
+        "Feature-style slow openings."
+      ]
+    }
+  }
+}
