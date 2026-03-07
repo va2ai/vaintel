@@ -40,6 +40,11 @@ function readJsonIfExists(filePath) {
   }
 }
 
+function isCanonicalDraftFile(fileName, draftId) {
+  if (!draftId) return false;
+  return fileName === `draft-${String(draftId).padStart(3, "0")}.json`;
+}
+
 function buildReviewQueue() {
   const draftsDir = path.join(ROOT, "scripts", "content-pipeline", "output", "drafts");
   const qaDir = path.join(ROOT, "scripts", "content-pipeline", "output", "qa-reports");
@@ -63,7 +68,7 @@ function buildReviewQueue() {
     })
     .filter(Boolean);
 
-  const queue = draftFiles
+  const queueItems = draftFiles
     .map((file) => {
       const fullPath = path.join(draftsDir, file);
       const draft = readJsonIfExists(fullPath);
@@ -102,7 +107,33 @@ function buildReviewQueue() {
         scorecard,
       };
     })
-    .filter(Boolean)
+    .filter(Boolean);
+
+  const queue = Array.from(queueItems
+    .reduce((deduped, item) => {
+      const existing = deduped.get(item.id);
+      if (!existing) {
+        deduped.set(item.id, item);
+        return deduped;
+      }
+
+      const itemTime = new Date(item.createdAt).getTime();
+      const existingTime = new Date(existing.createdAt).getTime();
+      const itemIsCanonical = isCanonicalDraftFile(item.draftFile, item.id);
+      const existingIsCanonical = isCanonicalDraftFile(existing.draftFile, existing.id);
+
+      if (itemTime > existingTime) {
+        deduped.set(item.id, item);
+        return deduped;
+      }
+
+      if (itemTime === existingTime && itemIsCanonical && !existingIsCanonical) {
+        deduped.set(item.id, item);
+      }
+
+      return deduped;
+    }, new Map())
+    .values())
     .sort((a, b) => {
       const scoreDiff = (b.scorecard?.overallScore || -1) - (a.scorecard?.overallScore || -1);
       if (scoreDiff !== 0) return scoreDiff;

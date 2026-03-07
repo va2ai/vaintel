@@ -257,8 +257,9 @@ export async function researchTopic(topic, opts = {}) {
 export async function verifyCAVCCase(partyName) {
   try {
     const results = await cavcSearch({ partyName });
-    if (results.results?.length > 0) {
-      return results.results[0];
+    const matches = Array.isArray(results) ? results : results?.results;
+    if (matches?.length > 0) {
+      return matches[0];
     }
     return null;
   } catch {

@@ -153,6 +153,11 @@ export function buildPostPrompt(styleGuide, schema, researchDossier, articleType
     'opinion': 'opinion',
   }[articleType] || 'explainer';
 
+  const caseSupport = researchDossier.caseSupport || {};
+  const verifiedCaseLine = caseSupport.hasVerifiedCase
+    ? `VERIFIED CASE SUPPORT: ${caseSupport.verifiedCaseName} (${caseSupport.verifiedCaseNumber})`
+    : 'VERIFIED CASE SUPPORT: none';
+
   return `You are the AI writing engine for Veteran2Veteran (V2V), a VA disability claims intelligence site. You write articles that are read by veterans navigating the VA disability claims system. Your writing must be indistinguishable from a knowledgeable veteran advocate who deeply understands VA law, regulations, and the claims process.
 
 === EDITORIAL VOICE ===
@@ -173,6 +178,13 @@ ${renderSchemaConstraints(schema, articleType)}
 === CTA TEMPLATE ===
 End the article with an action-items callout using this pattern:
 ${styleGuide.ctaTemplates[ctaKey]}
+
+=== CASE-CLAIM GUARDRAILS ===
+${verifiedCaseLine}
+- If you describe a specific CAVC ruling, opinion, or holding, you must name the case and include the docket/case number from the research dossier.
+- If the dossier does NOT contain a verified case name and docket, do NOT write that there was a specific CAVC ruling, decision, opinion, or holding.
+- Never imply that a generic topic label like "CAVC ruling on X" is itself proof of a real case.
+- When case support is missing, rewrite the piece as a general explainer or strategy article and say only what the dossier actually supports.
 
 === OUTPUT INSTRUCTIONS ===
 You will receive a research dossier containing source material, facts, citations, and analysis. Your job is to transform this raw research into a polished, publication-ready article.
@@ -200,6 +212,7 @@ The "body" field must:
 8. Include markdown tables where comparisons or rate data are relevant
 9. Cite specific CFR sections, CAVC cases, or VA policies — never make vague claims
 10. NEVER give direct legal or medical advice — frame everything as information
+11. Never claim a court ruling exists unless the research dossier provides the verified case identity
 
 Return ONLY the JSON object. No markdown code fences. No explanatory text before or after.
 

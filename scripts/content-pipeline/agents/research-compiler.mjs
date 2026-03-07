@@ -22,7 +22,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { extractEntities, scoreRelevance, classifyTopic, KEYWORDS } from '../lib/keywords.mjs';
-import { researchTopic, verifyCAVCCase } from '../lib/bva-api-client.mjs';
+import { researchTopic, verifyCAVCCase, cavcSearch, cavcCaseSummary, cavcDocket } from '../lib/bva-api-client.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -145,6 +145,204 @@ function sanitizeFilename(str) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 60);
+}
+
+function hasUnverifiedCAVCClaim(text) {
+  return /\bcavc\b/i.test(text || '') && /\b(ruling|decision|opinion|case)\b/i.test(text || '');
+}
+
+function normalizeGenericTopicTitle(text, fallback = 'Sleep apnea nexus letters') {
+  const cleaned = (text || '')
+    .trim()
+    .replace(/^(on|of|for|about)\s+/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleaned || cleaned.length < 8) return fallback;
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
+function looksLikeCAVCCaseTopic(dossier) {
+  const haystack = [
+    dossier.topic?.title || '',
+    ...(dossier.keyFacts || []).map((fact) => fact.fact || ''),
+    ...(dossier.suggestedTitles || []),
+  ].join(' ');
+  return /\bcavc\b/i.test(haystack) || /\bvet\.?\s*app\.?\b/i.test(haystack) || (dossier.relatedCAVCCases?.length || 0) > 0;
+}
+
+function extractCAVCSearchTerm(dossier) {
+  const namedCase = dossier.relatedCAVCCases?.[0]?.caseName;
+  if (namedCase) {
+    return namedCase.split(' v.')[0].trim();
+  }
+
+  const title = dossier.topic?.title || '';
+  const withoutLead = title
+    .replace(/\bcavc\b/ig, '')
+    .replace(/\b(ruling|decision|opinion|case)\b/ig, '')
+    .replace(/\b(on|of|for|about)\b/ig, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (withoutLead) return withoutLead;
+  return null;
+}
+
+function summarizeDocketEntries(docketEntries, limit = 5) {
+  return (docketEntries || []).slice(0, limit).map((entry) => ({
+    date: entry.date || null,
+    text: entry.text || '',
+    documentUrl: entry.doc_url || null,
+  }));
+}
+
+async function enrichWithCAVCData(dossier) {
+  if (!looksLikeCAVCCaseTopic(dossier)) return dossier;
+
+  const searchTerm = extractCAVCSearchTerm(dossier);
+  if (!searchTerm) return dossier;
+
+  log(`  Searching CAVC endpoint for: "${searchTerm}"`);
+
+  try {
+    const searchResults = await cavcSearch({ partyName: searchTerm });
+    const matches = Array.isArray(searchResults) ? searchResults : searchResults?.results || [];
+    if (!matches.length) {
+      dossier.cavcResearch = {
+        query: searchTerm,
+        matched: false,
+        note: 'No CAVC case matched the topic query.',
+      };
+      return dossier;
+    }
+
+    const match = matches[0];
+    const [summary, docket] = await Promise.all([
+      cavcCaseSummary(match.case_number),
+      cavcDocket(match.case_number),
+    ]);
+
+    dossier.cavcResearch = {
+      query: searchTerm,
+      matched: true,
+      caseNumber: match.case_number,
+      title: match.title,
+      openingDate: match.opening_date || summary?.docketed || null,
+      summary: {
+        appealFrom: summary?.appeal_from || null,
+        feeStatus: summary?.fee_status || null,
+        caseType: summary?.case_type || null,
+        docketEntriesCount: summary?.docket_entries_count || docket?.docket_entries?.length || 0,
+      },
+      parties: docket?.parties || summary?.parties || [],
+      recentDocketEntries: summarizeDocketEntries(docket?.docket_entries),
+    };
+
+    const existingIndex = (dossier.relatedCAVCCases || []).findIndex((entry) => {
+      const caseName = entry?.caseName || '';
+      return caseName === match.title || caseName.split(' v.')[0].trim().toLowerCase() === searchTerm.toLowerCase();
+    });
+
+    const enrichedCase = {
+      caseName: match.title,
+      source: existingIndex >= 0 ? dossier.relatedCAVCCases[existingIndex].source : 'cavc-endpoint',
+      verified: true,
+      efilingData: {
+        caseNumber: match.case_number,
+        title: match.title,
+        openingDate: match.opening_date || summary?.docketed || null,
+      },
+      docketEntries: summarizeDocketEntries(docket?.docket_entries, 8),
+    };
+
+    if (existingIndex >= 0) {
+      dossier.relatedCAVCCases[existingIndex] = {
+        ...dossier.relatedCAVCCases[existingIndex],
+        ...enrichedCase,
+      };
+    } else {
+      dossier.relatedCAVCCases = [enrichedCase, ...(dossier.relatedCAVCCases || [])];
+    }
+
+    if (dossier.suggestedArticleType !== 'cavc-analysis') {
+      dossier.suggestedArticleTypes = [
+        {
+          type: 'cavc-analysis',
+          priority: 'high',
+          description: 'Case-driven analysis of a verified CAVC appeal',
+          reason: `Verified CAVC case ${match.case_number} was found via the court docket endpoint.`,
+        },
+        ...(dossier.suggestedArticleTypes || []).filter((entry) => entry.type !== 'cavc-analysis'),
+      ];
+      dossier.suggestedArticleType = 'cavc-analysis';
+    }
+
+    log(`    CAVC match: ${match.title} -> ${match.case_number}`);
+  } catch (err) {
+    log(`    CAVC enrichment failed: ${err.message}`);
+    dossier.cavcResearch = {
+      query: searchTerm,
+      matched: false,
+      error: err.message,
+    };
+  }
+
+  return dossier;
+}
+
+function getVerifiedCaseRecord(dossier) {
+  return dossier.relatedCAVCCases?.find((entry) => entry?.verified && entry?.efilingData?.caseNumber) || null;
+}
+
+function applyCaseSupportGuardrails(dossier) {
+  const verifiedCase = getVerifiedCaseRecord(dossier);
+  const hasNamedCase = (dossier.relatedCAVCCases?.length || 0) > 0;
+  const hasVerifiedCase = Boolean(verifiedCase);
+  const unverifiedCaseClaim = hasUnverifiedCAVCClaim(dossier.topic?.title)
+    || (dossier.suggestedTitles || []).some((title) => hasUnverifiedCAVCClaim(title));
+
+  dossier.caseSupport = {
+    hasNamedCase,
+    hasVerifiedCase,
+    canClaimSpecificCAVCRuling: hasVerifiedCase,
+    verifiedCaseName: verifiedCase?.caseName || null,
+    verifiedCaseNumber: verifiedCase?.efilingData?.caseNumber || null,
+  };
+
+  if (!hasVerifiedCase && unverifiedCaseClaim) {
+    dossier.editorialWarnings = [
+      ...(dossier.editorialWarnings || []),
+      'Do not frame this as a specific CAVC ruling unless a named case and docket are verified.',
+    ];
+
+    dossier.topic.summary += ' No specific CAVC case name or docket has been verified yet.';
+
+    dossier.suggestedTitles = [
+      ...(dossier.suggestedTitles || []).filter((title) => !hasUnverifiedCAVCClaim(title)),
+    ];
+
+    if ((dossier.suggestedTitles || []).length === 0) {
+      dossier.suggestedTitles = ['Sleep apnea nexus letters: What Veterans Need to Know'];
+    }
+
+    if (hasUnverifiedCAVCClaim(dossier.topic.title)) {
+      dossier.topic.title = normalizeGenericTopicTitle(dossier.topic.title
+        .replace(/\bcavc\b/ig, '')
+        .replace(/\b(ruling|decision|opinion|case)\b/ig, '')
+      );
+    }
+
+    if (dossier.suggestedArticleType === 'cavc-analysis') {
+      dossier.suggestedArticleType = 'explainer';
+      dossier.suggestedArticleTypes = [
+        { type: 'explainer', priority: 'high', description: 'Plain-language explainer of the topic', reason: 'A specific CAVC case was not verified, so case-law analysis is not supported.' },
+        ...(dossier.suggestedArticleTypes || []).filter((entry) => entry.type !== 'cavc-analysis' && entry.type !== 'explainer'),
+      ];
+    }
+  }
+
+  return dossier;
 }
 
 // ---------------------------------------------------------------------------
@@ -471,11 +669,13 @@ function generateKeyQuestions(keywords, classification, impact) {
  */
 async function enrichWithBVAData(dossier) {
   const topicTitle = dossier.topic?.title || '';
-  if (!topicTitle) return dossier;
+  if (!topicTitle) return applyCaseSupportGuardrails(dossier);
 
   log(`Enriching dossier with BVA API data for: "${topicTitle.slice(0, 60)}"`);
 
   try {
+    dossier = await enrichWithCAVCData(dossier);
+
     // Search BVA decisions related to the topic
     const bvaResults = await researchTopic(topicTitle, { maxPages: 1, maxCases: 3 });
 
@@ -548,7 +748,7 @@ async function enrichWithBVAData(dossier) {
     }
   }
 
-  return dossier;
+  return applyCaseSupportGuardrails(dossier);
 }
 
 /**
@@ -638,7 +838,7 @@ function compileDossier(cluster) {
     },
   };
 
-  return dossier;
+  return applyCaseSupportGuardrails(dossier);
 }
 
 /**

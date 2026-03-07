@@ -613,7 +613,7 @@ function ItemList({ items, type, onEdit, onDelete, onCreate }) {
   );
 }
 
-function PipelineReviewPanel({ items, statuses, onSetStatus, onOpenEditor }) {
+function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEditor }) {
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? null);
 
   useEffect(() => {
@@ -627,6 +627,7 @@ function PipelineReviewPanel({ items, statuses, onSetStatus, onOpenEditor }) {
   }, [items, selectedId]);
 
   const selected = items.find((item) => item.id === selectedId) || items[0] || null;
+  const selectedKey = selected ? String(selected.id) : null;
   const selectedStatusRecord = selected ? statuses[selected.id] : null;
   const selectedStatus = selectedStatusRecord?.status || null;
   const selectedMeta = getPipelineStatusMeta(selectedStatus);
@@ -713,14 +714,19 @@ function PipelineReviewPanel({ items, statuses, onSetStatus, onOpenEditor }) {
                 </div>
 
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                  <button onClick={() => onSetStatus(selected.id, "approved")} style={{ ...S.btn, ...S.btnGold }}>Approve</button>
-                  <button onClick={() => onSetStatus(selected.id, "needs_revision")} style={{ ...S.btn, background: "#5a3e18", color: "#f3d9a1" }}>Needs Revision</button>
-                  <button onClick={() => onSetStatus(selected.id, "rejected")} style={{ ...S.btn, background: "#4a1820", color: "#ffb4b4" }}>Reject</button>
-                  <button onClick={() => onSetStatus(selected.id, null)} style={{ ...S.btn, ...S.btnOutline }}>Clear Status</button>
+                  <button disabled={savingId === selectedKey} onClick={() => onSetStatus(selected.id, "approved")} style={{ ...S.btn, ...S.btnGold, opacity: savingId === selectedKey ? 0.7 : 1 }}>Approve</button>
+                  <button disabled={savingId === selectedKey} onClick={() => onSetStatus(selected.id, "needs_revision")} style={{ ...S.btn, background: "#5a3e18", color: "#f3d9a1", opacity: savingId === selectedKey ? 0.7 : 1 }}>Needs Revision</button>
+                  <button disabled={savingId === selectedKey} onClick={() => onSetStatus(selected.id, "rejected")} style={{ ...S.btn, background: "#4a1820", color: "#ffb4b4", opacity: savingId === selectedKey ? 0.7 : 1 }}>Reject</button>
+                  <button disabled={savingId === selectedKey} onClick={() => onSetStatus(selected.id, null)} style={{ ...S.btn, ...S.btnOutline, opacity: savingId === selectedKey ? 0.7 : 1 }}>Clear Status</button>
                   <button onClick={() => onOpenEditor(selected)} style={{ ...S.btn, ...S.btnOutline }}>
                     Open In {selected.kind === "news" ? "News" : "Post"} Editor
                   </button>
                 </div>
+                {savingId === selectedKey && (
+                  <div style={{ fontSize: 12, color: "#8aa3c8", marginBottom: 16 }}>
+                    Saving review status...
+                  </div>
+                )}
                 {selectedStatusRecord && (
                   <div style={{ fontSize: 12, color: "#8aa3c8", marginBottom: 16 }}>
                     Reviewed by {selectedStatusRecord.reviewerEmail || "unknown"} {selectedStatusRecord.updatedAt ? `on ${new Date(selectedStatusRecord.updatedAt).toLocaleString()}` : ""}
@@ -876,6 +882,7 @@ export default function Admin() {
   const [news, setNews] = useState([]);
   const [pipelineItems, setPipelineItems] = useState([]);
   const [pipelineStatuses, setPipelineStatuses] = useState({});
+  const [pipelineSavingId, setPipelineSavingId] = useState(null);
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -946,14 +953,26 @@ export default function Admin() {
 
   const handleSetPipelineStatus = useCallback(async (id, status) => {
     setActionError("");
+    const key = String(id);
+    const previousStatus = pipelineStatuses[key];
+    const optimisticStatus = status ? {
+      ...previousStatus,
+      status,
+      reviewerEmail: user?.email || null,
+      updatedAt: new Date().toISOString(),
+    } : null;
+
+    setPipelineSavingId(key);
+    setPipelineStatuses((current) => {
+      const next = { ...current };
+      if (!optimisticStatus) delete next[key];
+      else next[key] = optimisticStatus;
+      return next;
+    });
+
     try {
       if (!status) {
         await deletePipelineReview(id);
-        setPipelineStatuses((current) => {
-          const next = { ...current };
-          delete next[id];
-          return next;
-        });
         return;
       }
 
@@ -963,14 +982,18 @@ export default function Admin() {
         updatedAt: new Date().toISOString(),
       };
       await savePipelineReview(id, nextStatus);
-      setPipelineStatuses((current) => ({
-        ...current,
-        [String(id)]: { ...current[String(id)], ...nextStatus },
-      }));
     } catch (e) {
+      setPipelineStatuses((current) => {
+        const next = { ...current };
+        if (previousStatus) next[key] = previousStatus;
+        else delete next[key];
+        return next;
+      });
       setActionError(formatAdminError(e, user, "update pipeline review state"));
+    } finally {
+      setPipelineSavingId(null);
     }
-  }, [user]);
+  }, [pipelineStatuses, user]);
 
   const handleOpenPipelineDraft = useCallback((item) => {
     if (!item?.draft) return;
@@ -1123,6 +1146,7 @@ export default function Admin() {
               <PipelineReviewPanel
                 items={pipelineItems}
                 statuses={pipelineStatuses}
+                savingId={pipelineSavingId}
                 onSetStatus={handleSetPipelineStatus}
                 onOpenEditor={handleOpenPipelineDraft}
               />
