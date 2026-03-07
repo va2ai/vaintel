@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
-const API = "https://bva-api-524576132881.us-central1.run.app";
+const API = "https://bva-api-301313738047.us-central1.run.app";
 
 // ── Text cleaning (strip BOM + encoding artifacts) ───────────────
 function cleanText(text) {
