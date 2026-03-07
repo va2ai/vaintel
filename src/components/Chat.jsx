@@ -3,9 +3,7 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { CloseIcon, SendIcon, BookIcon } from './icons.jsx';
 
-const CHAT_API = import.meta.env.DEV 
-  ? "/api/chat/message" 
-  : "https://vet-research-524576132881.us-central1.run.app/api/chat/message";
+const CHAT_API = "/api/chat/message";
 
 export function Chat({ contextTitle, contextType, contextText, suggestions }) {
   const [showChat, setShowChat] = useState(false);
