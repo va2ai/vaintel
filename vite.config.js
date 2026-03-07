@@ -6,7 +6,7 @@ import { resolve } from "path";
 
 // Plugin: assemble posts/ and guides/ folders into public JSON before build & dev
 function buildPostsPlugin() {
-  const script = resolve(__dirname, "build-posts.cjs");
+  const script = resolve(__dirname, "scripts/build-posts.cjs");
   const run = () => {
     if (existsSync(script)) {
       execFileSync("node", [script], { stdio: "inherit" });

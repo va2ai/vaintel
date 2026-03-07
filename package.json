@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node optimize-images.cjs && vite build",
+    "build": "node scripts/optimize-images.cjs && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
