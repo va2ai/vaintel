@@ -16,6 +16,16 @@ function buildPostsPlugin() {
     name: "build-posts",
     buildStart: run,
     configureServer(server) {
+      server.middlewares.use('/__rebuild', (req, res) => {
+        try {
+          run();
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true }));
+        } catch (e) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: e.message }));
+        }
+      });
       const postsDir = resolve(__dirname, "posts");
       const guidesDir = resolve(__dirname, "guides");
       server.watcher.add(postsDir);

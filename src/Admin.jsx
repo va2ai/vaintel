@@ -630,7 +630,7 @@ function ItemList({ items, type, onEdit, onDelete, onCreate }) {
   );
 }
 
-function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEditor }) {
+function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEditor, onRebuild }) {
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? null);
   const [view, setView] = useState("active");
 
@@ -674,12 +674,12 @@ function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEdi
                 <button onClick={() => setView("active")} style={{ ...S.btn, ...(view === "active" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Active</button>
                 <button onClick={() => setView("published")} style={{ ...S.btn, ...(view === "published" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Published</button>
                 <button onClick={() => setView("rejected")} style={{ ...S.btn, ...(view === "rejected" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Rejected</button>
-                <button onClick={() => window.location.reload()} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Refresh</button>
+                <button onClick={onRebuild} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Rebuild Queue</button>
               </div>
             </div>
             {!filteredItems.length && (
               <div style={{ color: "#8aa3c8", fontSize: 13, lineHeight: 1.6 }}>
-                No pipeline review items found in this view. Run `node scripts/build-posts.cjs` after generating drafts.
+                No pipeline review items found in this view. Click "Rebuild Queue" after generating drafts.
               </div>
             )}
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1427,6 +1427,16 @@ export default function Admin() {
                 savingId={pipelineSavingId}
                 onSetStatus={handleSetPipelineStatus}
                 onOpenEditor={handleOpenPipelineDraft}
+                onRebuild={async () => {
+                  try {
+                    const res = await fetch("/__rebuild");
+                    const data = await res.json();
+                    if (data.ok) window.location.reload();
+                    else alert("Rebuild failed: " + data.error);
+                  } catch (e) {
+                    alert("Rebuild failed: " + e.message);
+                  }
+                }}
               />
             )}
             {tab === "subscriptions" && (
