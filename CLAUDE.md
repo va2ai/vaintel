@@ -30,6 +30,8 @@ src/
   components/        # React components
   styles/            # CSS files
 
+scripts/             # Build & image generation scripts
+docs/                # Planning docs, reports, roadmaps
 guides/              # Guide content (JSON)
 posts/               # Blog posts (JSON)
 public/              # Static assets
@@ -44,11 +46,11 @@ public/              # Static assets
 
 ## Hero Image Generation
 
-Python scripts for generating hero images:
-- `gen-hero.py` - Base hero generator
-- `gen-guide-heroes.py` - Guide hero images
-- `gen-post-heroes.py` - Post hero images
-- `gen-resource-heroes.py` - Resource hero images
+Python scripts in `scripts/` for generating hero images:
+- `scripts/gen-hero.py` - Base hero generator
+- `scripts/gen-guide-heroes.py` - Guide hero images
+- `scripts/gen-post-heroes.py` - Post hero images
+- `scripts/gen-resource-heroes.py` - Resource hero images
 
 ## Deployment
 

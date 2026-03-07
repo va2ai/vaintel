@@ -8,10 +8,12 @@
 const fs = require("fs");
 const path = require("path");
 
+const ROOT = path.join(__dirname, "..");
+
 function buildCollection(dirName, sortFn, label) {
-  const dir = path.join(__dirname, dirName);
-  const pubOut = path.join(__dirname, "public", `${dirName}.json`);
-  const distOut = path.join(__dirname, "dist", `${dirName}.json`);
+  const dir = path.join(ROOT, dirName);
+  const pubOut = path.join(ROOT, "public", `${dirName}.json`);
+  const distOut = path.join(ROOT, "dist", `${dirName}.json`);
 
   if (!fs.existsSync(dir)) return 0;
   const files = fs.readdirSync(dir).filter(f => f.endsWith(".json"));

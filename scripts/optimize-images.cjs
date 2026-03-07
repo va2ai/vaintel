@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
 
-const IMG_DIR = path.join(__dirname, "public", "images");
+const IMG_DIR = path.join(__dirname, "..", "public", "images");
 const MAX_WIDTH = 1200;
 const WEBP_QUALITY = 80;
 const PNG_QUALITY = 80; // pngquant-style quality not available in sharp, but we can use compression level
