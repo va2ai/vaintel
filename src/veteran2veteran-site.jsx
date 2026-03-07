@@ -70,7 +70,13 @@ export default function V2VSite() {
   const [activeNews, setActiveNews] = useState(null);
   const [activeGuide, setActiveGuide] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [sectionFilter, setSectionFilter] = useState(null);
+
+  const handleOpenSearch = (query = '') => {
+    setSearchQuery(query);
+    setSearchOpen(true);
+  };
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -216,7 +222,7 @@ export default function V2VSite() {
   // ── Article View ──────────────────────────────────────────────
   if (activeArticle) {
     return (
-      <Layout activeSection={getSection(activeArticle)} onSearchClick={() => setSearchOpen(true)}>
+      <Layout activeSection={getSection(activeArticle)} onSearchClick={() => handleOpenSearch('')}>
         <ArticlePage
           article={activeArticle}
           allPosts={posts}
@@ -240,7 +246,7 @@ export default function V2VSite() {
     ];
 
     return (
-      <Layout activeSection="va-policy" onSearchClick={() => setSearchOpen(true)}>
+      <Layout activeSection="va-policy" onSearchClick={() => handleOpenSearch('')}>
         <ArticlePage
           article={activeNews}
           allPosts={news}
@@ -262,7 +268,7 @@ export default function V2VSite() {
   // ── Guide View ────────────────────────────────────────────────
   if (activeGuide) {
     return (
-      <Layout activeSection="tools" onSearchClick={() => setSearchOpen(true)}>
+      <Layout activeSection="tools" onSearchClick={() => handleOpenSearch('')}>
         <GuidePage
           guide={activeGuide}
           guides={guides}
@@ -297,7 +303,7 @@ export default function V2VSite() {
     const sectionItems = filterBySection(allContent, sectionFilter);
 
     return (
-      <Layout activeSection={sectionFilter} onSearchClick={() => setSearchOpen(true)}>
+      <Layout activeSection={sectionFilter} onSearchClick={() => handleOpenSearch('')}>
         <div style={{ maxWidth: 1120, margin: "0 auto", padding: "40px 20px" }}>
           {sectionDesc && (
             <p style={{ fontFamily: "var(--sans)", fontSize: 15, color: "var(--ink-light)", lineHeight: 1.6, marginBottom: 24, maxWidth: 680 }}>
@@ -323,7 +329,7 @@ export default function V2VSite() {
   const heroId = heroItem?.id;
 
   return (
-    <Layout activeSection="latest" onSearchClick={() => setSearchOpen(true)}>
+    <Layout activeSection="latest" onSearchClick={() => handleOpenSearch('')}>
 
       {/* ── Authority Publication Masthead ── */}
       <div className="pub-masthead">
@@ -353,13 +359,13 @@ export default function V2VSite() {
       <div className="topic-nav-strip">
         <div className="topic-nav-strip__inner hide-scroll">
           <span className="topic-nav-label">Topics:</span>
-          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>PTSD</button>
-          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Sleep Apnea</button>
-          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>TDIU</button>
-          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Migraines</button>
-          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Back Pay</button>
-          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>CAVC</button>
-          <button className="topic-nav-link" onClick={() => setSearchOpen(true)}>Policy Updates</button>
+          <button className="topic-nav-link" onClick={() => handleOpenSearch('PTSD')}>PTSD</button>
+          <button className="topic-nav-link" onClick={() => handleOpenSearch('Sleep Apnea')}>Sleep Apnea</button>
+          <button className="topic-nav-link" onClick={() => handleOpenSearch('TDIU')}>TDIU</button>
+          <button className="topic-nav-link" onClick={() => handleOpenSearch('Migraines')}>Migraines</button>
+          <button className="topic-nav-link" onClick={() => handleOpenSearch('Back Pay')}>Back Pay</button>
+          <button className="topic-nav-link" onClick={() => handleOpenSearch('CAVC')}>CAVC</button>
+          <button className="topic-nav-link" onClick={() => handleOpenSearch('Policy Updates')}>Policy Updates</button>
         </div>
       </div>
 
@@ -428,7 +434,6 @@ export default function V2VSite() {
       {/* Chat Widget */}
       <Chat />
 
-      {/* Search Overlay */}
       <SearchOverlay
         posts={posts}
         guides={guides}
@@ -436,6 +441,7 @@ export default function V2VSite() {
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
         onNavigate={handleSearchNavigate}
+        initialQuery={searchQuery}
       />
     </Layout>
   );

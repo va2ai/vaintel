@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { CloseIcon, SearchIcon } from './icons.jsx';
 
-export function SearchOverlay({ posts, guides, news, isOpen, onClose, onNavigate }) {
+export function SearchOverlay({ posts, guides, news, isOpen, onClose, onNavigate, initialQuery = '' }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState({ articles: [], guides: [], news: [] });
   const inputRef = useRef(null);
@@ -10,11 +10,16 @@ export function SearchOverlay({ posts, guides, news, isOpen, onClose, onNavigate
   // Auto-focus on open
   useEffect(() => {
     if (isOpen) {
-      setQuery('');
-      setResults({ articles: [], guides: [], news: [] });
+      setQuery(initialQuery);
+      if (initialQuery) {
+        // execute immediate search for the initial query
+        search(initialQuery);
+      } else {
+        setResults({ articles: [], guides: [], news: [] });
+      }
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen]);
+  }, [isOpen, initialQuery]);
 
   // Close on Escape
   useEffect(() => {

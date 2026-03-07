@@ -21,9 +21,8 @@ export function ArticlePage({ article, allPosts, onBack, onArticleClick, isNews 
         background: isNews ? "rgba(11,26,46,0.97)" : "rgba(250,250,245,0.95)",
         backdropFilter: "blur(10px)",
         borderBottom: isNews ? "2px solid var(--gold-500)" : "1px solid var(--cream-border)",
-        padding: "0 var(--pad)",
       }}>
-        <div style={{ maxWidth: "var(--max-w)", margin: "0 auto", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "0 32px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button onClick={onBack} style={{
             background: "none", border: "none", cursor: "pointer",
             color: isNews ? "var(--gold-400)" : "var(--navy-700)",
@@ -34,7 +33,7 @@ export function ArticlePage({ article, allPosts, onBack, onArticleClick, isNews 
       </nav>
 
       {/* Breadcrumb & Section row */}
-      <div style={{ maxWidth: 820, margin: "0 auto", padding: "16px 32px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "16px 32px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
         <div style={{ fontFamily: "'Source Sans 3'", fontSize: 13, color: "var(--ink-muted)", display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ cursor: "pointer", transition: "color 0.15s" }} onClick={onBack} onMouseEnter={e => e.target.style.color = "var(--navy-700)"} onMouseLeave={e => e.target.style.color = "var(--ink-muted)"}>{isNews ? "News" : "Analysis"}</span>
           <span style={{ color: "var(--cream-border)" }}>/</span>
