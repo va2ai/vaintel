@@ -77,11 +77,12 @@ export function Footer() {
       ],
     },
     {
-      title: 'Products',
+      title: 'Tools',
       links: [
         { label: 'Decision Search', path: '/bva' },
         { label: 'Nexus Scout', path: '/nexus-scout' },
         { label: 'Tools', path: '/tools' },
+        { label: 'Pricing', path: '/pricing' },
       ],
     },
     {

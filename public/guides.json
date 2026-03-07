@@ -478,5 +478,38 @@
         "body": "Knowing the regulation numbers is only half the battle. Here's how to **actually weaponize them**.\n\n---\n\n**Where to cite CFR sections:**\n\n| Filing Type | How to Use CFR |\n|------------|----------------|\n| **Statement in Support (VA Form 21-4138)** | Cite the specific section when arguing your point |\n| **Supplemental Claim** | Identify what was missing before, cite the reg your new evidence satisfies |\n| **Board Appeal** | Cite the regulation the Regional Office failed to apply |\n| **Higher Rating Request** | Pair `4.7` (higher of two evaluations) with `4.3` (reasonable doubt) |\n\n> [!quote] Example statement: \"Under `38 CFR 4.3`, when the evidence for and against my claim is in approximate balance, the benefit of the doubt must be resolved in my favor. My private physician's opinion supports a 50% rating while the C&P examiner's opinion supports 30%. I respectfully request that reasonable doubt be applied.\"\n\n> [!quote] Example supplemental claim: \"My prior claim was denied for lack of a nexus. I am submitting a medical nexus opinion from Dr. Smith establishing the required link under `38 CFR 3.303(a)`.\"\n\n---\n\n**Board Appeal targeting:**\n\n| If the RO Did This... | Cite This |\n|-----------------------|-----------|\n| Ignored painful motion | `4.59` |\n| Didn't consider functional loss during flare-ups | `4.40` and `4.45` |\n| Relied on one exam, ignored treatment records | `4.6` |\n| Didn't provide an exam | `3.159(d)` |\n| Ignored your lay evidence | `3.303(a)` |\n\n> [!check] **The power moves:**\n\n- **Always** file an **Intent to File** (`38 CFR 3.155`) before gathering evidence -- it locks in your effective date for up to one year\n- **Request copies** of your C-file so you can see exactly what evidence the VA has\n- Get **buddy statements** for anything hard to prove with medical records alone\n- If your C&P exam was inadequate, **request a new one** and cite the specific regulation violated\n- Keep a **symptom log** -- it's powerful evidence when combined with rating criteria from Part 4\n\n> [!warning] Don't just throw regulation numbers at the VA without connecting them to your facts. State the regulation, explain what it requires, and show how your evidence meets that requirement. That's the formula that works.\n\n> [!tip] The most powerful regulation combos: `4.7` + `4.3` for higher ratings, `3.303` + `3.310` for secondary claims, and `3.159` + `3.326` when the VA failed its duty to assist."
       }
     ]
+  },
+  {
+    "id": "editorial-standards",
+    "icon": "📰",
+    "title": "Editorial Standards",
+    "desc": "How Veteran 2 Veteran researches, writes, and verifies claims intelligence content",
+    "readTime": "6 min",
+    "sections": [
+      {
+        "heading": "Our Mission",
+        "body": "Veteran 2 Veteran is an independent VA claims intelligence publication. We combine original reporting, legal research, and domain-specific tools to help veterans, advocates, and attorneys navigate the VA disability claims process.\n\nWe are **not affiliated with the Department of Veterans Affairs**. Nothing on this site constitutes legal advice. Our goal is to make the rules, precedent, and strategy of VA claims accessible to the people who need them most."
+      },
+      {
+        "heading": "Source Standards",
+        "body": "Every factual claim in our articles is grounded in verifiable primary sources:\n\n- **38 CFR** -- Code of Federal Regulations, Title 38 (verified at ecfr.gov)\n- **38 USC** -- United States Code, Title 38\n- **BVA Decisions** -- Board of Veterans' Appeals published decisions\n- **CAVC Opinions** -- Court of Appeals for Veterans Claims published opinions\n- **M21-1 Adjudication Manual** -- VA's internal procedures for raters\n- **Federal Register** -- Proposed and final VA rulemaking\n- **KnowVA** -- VA's knowledge management system\n\nWhen we reference a regulation, case, or manual section, we provide the specific citation so readers can verify it independently. We do not cite sources we have not reviewed."
+      },
+      {
+        "heading": "AI Use Policy",
+        "body": "We use AI tools in our editorial and research process. Here is exactly how:\n\n**What AI does:**\n- Assists with initial research across large document sets (BVA decisions, CFR sections, CAVC opinions)\n- Helps draft structured outlines and summaries\n- Identifies relevant regulatory cross-references\n\n**What AI does not do:**\n- Generate final published content without human review and editing\n- Create medical opinions or nexus rationales\n- Produce legal advice or case-specific strategy recommendations\n- Replace verification against primary sources\n\n**Every article goes through human editorial review before publication.** AI-assisted research is verified against primary sources. AI-generated language is reviewed for accuracy, tone, and compliance with our style standards.\n\nWe believe AI is a powerful research accelerator when used responsibly. We also believe veterans deserve to know exactly how it is used in the content they rely on."
+      },
+      {
+        "heading": "Editorial Categories",
+        "body": "Our content is organized into five editorial sections:\n\n- **VA Policy** -- Regulation updates, rulemaking analysis, M21-1 changes, and policy impact reporting\n- **Claims Strategy** -- Evidence building, filing tactics, nexus letter guidance, and claim-strengthening workflows\n- **Case Analysis** -- BVA decision patterns, CAVC precedent breakdowns, and appellate strategy\n- **Explainers** -- Plain-language guides to VA processes, rating criteria, and veteran rights\n- **Opinion** -- Analysis and commentary on systemic issues, AI in claims, and veteran advocacy"
+      },
+      {
+        "heading": "Accuracy and Corrections",
+        "body": "If we get something wrong, we fix it. Corrections are noted at the top of the affected article with the date of correction and a description of what changed.\n\nIf you find an error in any of our content -- a wrong CFR citation, an outdated regulation, a mischaracterized case holding -- contact us. We take accuracy seriously because veterans make real decisions based on this information."
+      },
+      {
+        "heading": "What We Are Not",
+        "body": "- We are **not a law firm** and do not provide legal advice\n- We are **not accredited representatives** and do not file claims on behalf of veterans\n- We are **not affiliated with the VA** or any government agency\n- We do **not guarantee** any specific claim outcome\n\nOur tools and content are designed to support your research and understanding. For claim filing, strategy, and legal representation, work with an accredited VSO, claims agent, or attorney."
+      }
+    ]
   }
 ]

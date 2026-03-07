@@ -1,14 +1,19 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown, BookIcon } from './icons.jsx';
 
 const AI_TOOLS = [
-  { name: "BVA Decision Search", desc: "Search thousands of Board decisions by keyword, issue, or outcome.", status: "Live", link: "/bva" },
-  { name: "CAVC Case Analyzer", desc: "Detailed breakdowns of Court decisions -- holdings, reasoning, practical impact.", status: "Live" },
-  { name: "38 CFR Navigator", desc: "Ask plain-language questions, get the exact regulation sections you need.", status: "Live" },
-  { name: "KnowVA / M21-1 Search", desc: "Search VA's adjudication manual to see how raters evaluate your claim type.", status: "Live" },
-  { name: "Claims Research Assistant", desc: "AI research system cross-referencing BVA decisions, CAVC precedent, and CFR.", status: "Beta" },
-  { name: "Nexus Scout", desc: "Select your primary condition and discover potential secondary claims backed by BVA case evidence.", status: "Live", link: "/nexus-scout" },
+  { name: "BVA Decision Search", desc: "Search thousands of Board decisions by keyword, issue, or outcome.", status: "Live", tier: "Free", link: "/bva" },
+  { name: "CAVC Precedent Library", desc: "Detailed breakdowns of Court decisions -- holdings, reasoning, practical impact.", status: "Live", tier: "Free" },
+  { name: "38 CFR Navigator", desc: "Ask plain-language questions, get the exact regulation sections you need.", status: "Live", tier: "Free" },
+  { name: "KnowVA / M21-1 Search", desc: "Search VA's adjudication manual to see how raters evaluate your claim type.", status: "Live", tier: "Free" },
+  { name: "VA Math Calculator", desc: "Estimate your combined VA disability rating using the actual bilateral factor formula.", status: "Live", tier: "Free" },
+  { name: "Nexus Scout Lite", desc: "Select your primary condition and discover potential secondary claims backed by BVA case evidence.", status: "Live", tier: "Free", link: "/nexus-scout" },
+  { name: "Claim Research Assistant", desc: "Cross-source claim research grounded in BVA decisions, CAVC precedent, and CFR.", status: "Beta", tier: "Pro" },
+  { name: "Nexus Scout Pro", desc: "Expanded secondary-claim research with stronger evidence mapping and claim-building suggestions.", status: "Coming", tier: "Pro" },
+  { name: "CAVC Case Analyzer", desc: "Structured case breakdowns with holdings, reasoning, and claims-strategy implications.", status: "Coming", tier: "Pro" },
+  { name: "Decision Deconstructor", desc: "Upload a VA decision for favorable findings extraction, denial basis mapping, and next-step strategy.", status: "Coming", tier: "Professional" },
+  { name: "Appeal Strategy Workbench", desc: "Issue mapping, appeal-oriented research, evidence gap review, and structured next-step strategy.", status: "Coming", tier: "Professional" },
 ];
 
 export function ToolsSection({ onChatOpen, guides, onGuideClick }) {
@@ -52,19 +57,24 @@ export function ToolsSection({ onChatOpen, guides, onGuideClick }) {
         <div style={{ maxWidth: "var(--max-w)", margin: "0 auto" }}>
           <div className="ai-tools-layout">
           <div>
-            <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "var(--gold-400)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>AI-Powered Research</div>
+            <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, color: "var(--gold-400)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>Claims Intelligence</div>
             <h2 style={{ fontFamily: "'Lora'", fontSize: 22, fontWeight: 700, marginBottom: 6 }}>Research Tools</h2>
-            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", marginBottom: 24, maxWidth: 500 }}>Professional-grade claims intelligence tools for searching BVA decisions, CAVC precedent, VA regulations, and adjudication guidance.</p>
+            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", marginBottom: 24, maxWidth: 500 }}>Professional-grade tools for searching BVA decisions, CAVC precedent, VA regulations, and adjudication guidance.</p>
           </div>
           <div className="ai-tools-list" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {AI_TOOLS.map((tool, i) => (
               <div key={i} onClick={() => setExpandedTool(expandedTool === i ? null : i)} style={{ padding: "16px 20px", borderRadius: "var(--radius)", border: "1px solid", borderColor: expandedTool === i ? "var(--gold-500)" : "rgba(255,255,255,0.1)", background: expandedTool === i ? "rgba(255,255,255,0.05)" : "transparent", cursor: "pointer", transition: "all 0.2s" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                     <span style={{ fontWeight: 600, fontSize: 15 }}>{tool.name}</span>
-                    <span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 10, fontFamily: "'JetBrains Mono'", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", background: tool.status === "Live" ? "rgba(34,197,94,0.15)" : "rgba(234,179,8,0.15)", color: tool.status === "Live" ? "#22c55e" : "#eab308", border: `1px solid ${tool.status === "Live" ? "rgba(34,197,94,0.3)" : "rgba(234,179,8,0.3)"}`, display: "inline-flex", alignItems: "center", gap: 4, minHeight: "auto" }}>
+                    <span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 10, fontFamily: "'JetBrains Mono'", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", background: tool.status === "Live" ? "rgba(34,197,94,0.15)" : tool.status === "Beta" ? "rgba(234,179,8,0.15)" : "rgba(148,163,184,0.15)", color: tool.status === "Live" ? "#22c55e" : tool.status === "Beta" ? "#eab308" : "#94a3b8", border: `1px solid ${tool.status === "Live" ? "rgba(34,197,94,0.3)" : tool.status === "Beta" ? "rgba(234,179,8,0.3)" : "rgba(148,163,184,0.3)"}`, display: "inline-flex", alignItems: "center", gap: 4, minHeight: "auto" }}>
                       {tool.status === "Live" && <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e" }} />}{tool.status}
                     </span>
+                    {tool.tier && tool.tier !== "Free" && (
+                      <span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 10, fontFamily: "'JetBrains Mono'", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", background: tool.tier === "Pro" ? "rgba(99,102,241,0.15)" : "rgba(168,85,247,0.15)", color: tool.tier === "Pro" ? "#818cf8" : "#c084fc", border: `1px solid ${tool.tier === "Pro" ? "rgba(99,102,241,0.3)" : "rgba(168,85,247,0.3)"}` }}>
+                        {tool.tier}
+                      </span>
+                    )}
                   </div>
                   <div style={{ transform: expandedTool === i ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s", color: "var(--ink-muted)" }}><ChevronDown /></div>
                 </div>
@@ -74,8 +84,13 @@ export function ToolsSection({ onChatOpen, guides, onGuideClick }) {
           </div>
           </div>
           <button onClick={onChatOpen} style={{ marginTop: 24, background: "var(--gold-500)", border: "none", padding: "14px 28px", borderRadius: 8, fontWeight: 700, fontSize: 15, color: "var(--navy-900)", cursor: "pointer", fontFamily: "'Source Sans 3'", gap: 8, justifyContent: "center", width: "100%" }}>
-            Try the Research Assistant <ArrowRight />
+            Start Research <ArrowRight />
           </button>
+          <div style={{ textAlign: "center", marginTop: 12 }}>
+            <Link to="/pricing" style={{ fontSize: 13, color: "var(--gold-400)", textDecoration: "none", fontFamily: "'Source Sans 3'", fontWeight: 500 }}>
+              Compare Free, Pro, and Professional plans
+            </Link>
+          </div>
         </div>
       </section>
     </>
