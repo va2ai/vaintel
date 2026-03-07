@@ -674,7 +674,8 @@ function PipelineReviewPanel({ items, statuses, savingId, onSetStatus, onOpenEdi
                 <button onClick={() => setView("active")} style={{ ...S.btn, ...(view === "active" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Active</button>
                 <button onClick={() => setView("published")} style={{ ...S.btn, ...(view === "published" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Published</button>
                 <button onClick={() => setView("rejected")} style={{ ...S.btn, ...(view === "rejected" ? S.btnGold : S.btnOutline), fontSize: 11 }}>Rejected</button>
-                <button onClick={onRebuild} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Rebuild Queue</button>
+                {onRebuild && <button onClick={onRebuild} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Rebuild Queue</button>}
+                <button onClick={() => window.location.reload()} style={{ ...S.btn, ...S.btnOutline, fontSize: 11 }}>Refresh</button>
               </div>
             </div>
             {!filteredItems.length && (
@@ -1427,12 +1428,13 @@ export default function Admin() {
                 savingId={pipelineSavingId}
                 onSetStatus={handleSetPipelineStatus}
                 onOpenEditor={handleOpenPipelineDraft}
-                onRebuild={async () => {
+                onRebuild={!import.meta.env.DEV ? null : async () => {
                   try {
                     const res = await fetch("/__rebuild");
+                    if (!res.ok) throw new Error("Server returned " + res.status);
                     const data = await res.json();
                     if (data.ok) window.location.reload();
-                    else alert("Rebuild failed: " + data.error);
+                    else throw new Error(data.error);
                   } catch (e) {
                     alert("Rebuild failed: " + e.message);
                   }
