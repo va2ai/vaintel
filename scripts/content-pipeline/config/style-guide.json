@@ -1,0 +1,250 @@
+{
+  "voice": {
+    "identity": "Veteran2Veteran (V2V) — written by veterans, for veterans",
+    "tone": "Direct, authoritative, no-BS, informative, occasionally wry",
+    "perspective": "First-person plural when addressing the community ('we'), second-person when giving guidance ('you', 'your claim')",
+    "register": "Conversational but competent — like a knowledgeable buddy at the VFW who happens to have a law degree",
+    "authority": "Always cite specific regulatory sections, CAVC cases, or VA policies. Never make claims without backing them up.",
+    "empathy": "Acknowledge the frustration and exhaustion of the claims process without being patronizing. Veterans reading this have been through it.",
+    "rules": [
+      "Write like you are talking to a fellow veteran across a table, not lecturing from a podium",
+      "Be specific — numbers, dates, CFR sections, case names. Vagueness kills credibility.",
+      "Assume the reader is intelligent but may not know legal terminology. Define terms on first use.",
+      "Never sugarcoat bad news. If a ruling is bad for veterans, say so clearly.",
+      "Use active voice. The VA denied the claim — the claim was not denied by the VA.",
+      "Short paragraphs. Long walls of text lose people who are reading on phones.",
+      "Lead with what matters most. Bury the lede and you lose the reader.",
+      "End every article with clear, actionable next steps."
+    ]
+  },
+  "formatting": {
+    "headings": {
+      "style": "## :emoji: Heading Text",
+      "rules": [
+        "Use H2 (##) for all major section headers",
+        "Every H2 must start with an emoji code from the approved list",
+        "Use H3 (###) for subsections within an H2 — no emoji required on H3",
+        "Never use H1 (#) in the body — the title serves as H1",
+        "Keep headings concise — aim for 3-7 words"
+      ],
+      "emojiMap": {
+        ":gavel:": "Legal holdings, court decisions, regulatory actions",
+        ":shield:": "Protections, defenses, safeguards for veterans",
+        ":search:": "Analysis, investigation, deep dives, research findings",
+        ":target:": "Actionable advice, strategic recommendations, what to do",
+        ":book:": "Background information, regulatory framework, definitions",
+        ":star:": "Key highlights, important distinctions, standout points",
+        ":flag:": "Warnings about pitfalls, common mistakes, traps",
+        ":fire:": "Breaking news, urgent developments, hot takes",
+        ":medal:": "Bottom line, summary, conclusion, takeaways",
+        ":alert:": "Critical warnings, danger zones, time-sensitive issues",
+        ":doc:": "Documentation requirements, paperwork, filing instructions",
+        ":tools:": "Practical tools, resources, how-to instructions",
+        ":link:": "Related resources, cross-references, further reading"
+      }
+    },
+    "callouts": {
+      "types": {
+        "> [!important]": "Critical information the reader must not miss. Use for key legal holdings, deadlines, or rights.",
+        "> [!tip]": "Practical advice that gives the reader an edge. Use for strategic recommendations.",
+        "> [!warning]": "Potential pitfalls or risks. Use when the reader could make a costly mistake.",
+        "> [!danger]": "Serious risks — claim denial, loss of benefits, legal jeopardy. Use sparingly for maximum impact.",
+        "> [!check]": "Action items or checklists. Use at the end of articles for concrete next steps.",
+        "> [!quote]": "Direct quotes from court decisions, VA officials, or regulations."
+      },
+      "rules": [
+        "Every article should have at least 2 callouts",
+        "Always end with a > [!check] or > [!tip] callout containing action items",
+        "Do not overuse > [!danger] — if everything is dangerous, nothing is",
+        "Callout text should be self-contained — a reader skimming only callouts should get the key points"
+      ]
+    },
+    "tables": {
+      "rules": [
+        "Use markdown tables for rate comparisons, deadline summaries, or side-by-side regulatory comparisons",
+        "Always include a header row",
+        "Keep tables to 5-7 columns maximum for mobile readability",
+        "Bold the most important column values"
+      ]
+    },
+    "emphasis": {
+      "bold": "Use **bold** for key terms on first definition, important names, and critical numbers",
+      "italic": "Use *italic* for case names (e.g., *Euzebio v. McDonough*) and publication titles",
+      "backtick": "Use `backticks` for CFR references (e.g., `38 CFR 4.16`), form numbers (e.g., `VA Form 21-526EZ`), and diagnostic codes",
+      "rules": [
+        "Do not over-bold. If everything is bold, nothing stands out.",
+        "Case names are always italicized on every mention",
+        "CFR sections always get backticks on every mention"
+      ]
+    }
+  },
+  "wordChoice": {
+    "preferred": {
+      "veteran": "NEVER 'vet' (informal, dismissive)",
+      "claim": "NOT 'application' (claims are adversarial, applications are passive)",
+      "service-connected": "NOT 'related to service' (use the legal term)",
+      "rating decision": "NOT 'determination letter'",
+      "C&P exam": "Full name 'Compensation and Pension examination' on first use, then 'C&P exam'",
+      "supplemental claim": "NOT 'reopened claim' (use the AMA lane name)",
+      "Higher-Level Review": "Always capitalize, abbreviated 'HLR' after first use",
+      "Board of Veterans Appeals": "Full name on first use, then 'the Board' or 'BVA'",
+      "CAVC": "Full name 'Court of Appeals for Veterans Claims' on first use",
+      "disability rating": "NOT 'disability percentage' or 'disability score'",
+      "evidence": "NOT 'proof' or 'documentation' (use the legal term VA uses)",
+      "nexus": "Explain as 'medical connection' on first use in an article",
+      "remand": "Explain as 'sent back for a new decision' on first use",
+      "deny/denial": "NOT 'reject/rejection' (use VA's terminology)",
+      "grant": "NOT 'approve/approval' (use VA's terminology)",
+      "VSO": "Full name 'Veterans Service Organization' on first use"
+    },
+    "prohibited": [
+      "We recommend you...",
+      "You should consult an attorney...",
+      "This constitutes legal advice...",
+      "We guarantee...",
+      "This will definitely...",
+      "In our legal opinion...",
+      "As your attorney...",
+      "We diagnose...",
+      "This medical information should replace...",
+      "You don't need a lawyer...",
+      "Just file the claim and...",
+      "It's easy to...",
+      "Simply...",
+      "The VA owes you..."
+    ],
+    "disclaimerFraming": [
+      "This is information, not legal advice. Consider consulting with a VSO or accredited claims agent.",
+      "Every claim is different. What worked in [case] may not apply to your specific situation.",
+      "This analysis is based on publicly available decisions and regulations."
+    ]
+  },
+  "sectionGuidelines": {
+    "cavc": {
+      "tone": "Analytical, precise, case-law focused",
+      "requiredElements": [
+        "Case name and citation in the first two paragraphs",
+        "What the court actually held (plain language)",
+        "The regulatory framework the decision interprets",
+        "Practical impact on veterans' claims",
+        "How to cite/use the decision in your own claim",
+        "Related caselaw references"
+      ],
+      "structure": [
+        "## :gavel: What the Court Actually Held",
+        "## :book: The Regulatory Framework",
+        "## :search: What Went Wrong in [Veteran]'s Case",
+        "## :shield: Why This Decision Matters for Your Claim",
+        "## :target: How to Use [Case Name] in Your Claim",
+        "## :medal: The Bottom Line"
+      ],
+      "wordCount": { "min": 1500, "target": 2500, "max": 3500 }
+    },
+    "va-policy": {
+      "tone": "Informative, watchdog, slightly skeptical of VA bureaucracy",
+      "requiredElements": [
+        "The specific policy change with regulatory citation",
+        "Before vs. after comparison",
+        "Who is affected and how",
+        "Timeline for implementation",
+        "What veterans should do right now",
+        "Link to the source regulation or announcement"
+      ],
+      "structure": [
+        "## :gavel: What Changed",
+        "## :search: What It Means",
+        "## :shield: Who Is Affected",
+        "## :target: What You Should Do",
+        "## :medal: The Bottom Line"
+      ],
+      "wordCount": { "min": 1000, "target": 1800, "max": 2500 }
+    },
+    "claims-strategy": {
+      "tone": "Tactical, empowering, step-by-step",
+      "requiredElements": [
+        "Clear statement of the strategy",
+        "Regulatory basis (why this works)",
+        "Step-by-step implementation",
+        "Evidence requirements",
+        "Common mistakes to avoid",
+        "Real-world example or scenario"
+      ],
+      "structure": [
+        "## :target: The Strategy",
+        "## :book: The Regulatory Basis",
+        "## :tools: Step-by-Step Implementation",
+        "## :doc: Evidence You Need",
+        "## :flag: Common Pitfalls",
+        "## :medal: The Bottom Line"
+      ],
+      "wordCount": { "min": 1200, "target": 2000, "max": 3000 }
+    },
+    "explainers": {
+      "tone": "Educational, patient, thorough",
+      "requiredElements": [
+        "Clear definition of the topic",
+        "Regulatory citations",
+        "How it works in practice (not just theory)",
+        "Examples with specific numbers or scenarios",
+        "Common misconceptions addressed",
+        "Comparison table if applicable"
+      ],
+      "structure": [
+        "## :book: What Is [Topic]",
+        "## :search: How It Actually Works",
+        "## :star: Key Details Most Veterans Miss",
+        "## :flag: Common Misconceptions",
+        "## :target: What This Means for Your Claim",
+        "## :medal: The Bottom Line"
+      ],
+      "wordCount": { "min": 1200, "target": 2000, "max": 3000 }
+    },
+    "opinion": {
+      "tone": "Opinionated, passionate, backed by evidence",
+      "requiredElements": [
+        "Clear thesis statement in the first paragraph",
+        "Supporting evidence from regulations, data, or cases",
+        "Acknowledgment of counterarguments",
+        "Personal perspective clearly labeled as such",
+        "Call to action"
+      ],
+      "structure": [
+        "## :fire: The Problem",
+        "## :search: The Evidence",
+        "## :shield: The Other Side",
+        "## :target: What Should Change",
+        "## :medal: The Bottom Line"
+      ],
+      "wordCount": { "min": 800, "target": 1500, "max": 2000 }
+    },
+    "news": {
+      "tone": "Factual, timely, concise but complete",
+      "requiredElements": [
+        "The news event in the first paragraph",
+        "Context and background",
+        "Impact on veterans",
+        "What veterans should do (if applicable)",
+        "Source attribution"
+      ],
+      "structure": [
+        "## :gavel: or :fire: [What Happened]",
+        "## :search: [Context/Analysis]",
+        "## :target: What This Means for [You/Veterans]"
+      ],
+      "wordCount": { "min": 500, "target": 1000, "max": 1500 }
+    }
+  },
+  "ctaTemplates": {
+    "cavc": "**Your action items:** (1) [specific action based on the decision]. (2) If you have a pending appeal, cite [case name] and demand the Board address all your evidence. (3) [additional action]. Do not wait — do this now.",
+    "va-policy": "**What to do now:** (1) Check whether this policy change affects your pending claim. (2) [specific action]. (3) Contact your VSO if you need help navigating the change.",
+    "claims-strategy": "**Get started today:** (1) [first concrete step]. (2) [second step]. (3) [third step]. The longer you wait, the longer the timeline.",
+    "explainer": "**Key takeaway:** Now that you understand [topic], [what to do with that knowledge]. If you have questions about how this applies to your specific situation, [resource or next step].",
+    "news": "**Stay informed:** Bookmark this page — we will update it as the situation develops. If this affects your claim, [specific action].",
+    "opinion": "**Make your voice heard:** [call to action — contact representative, join effort, share experience]."
+  },
+  "readTimeCalculation": {
+    "wordsPerMinute": 250,
+    "formula": "Math.ceil(wordCount / 250) + ' min'",
+    "roundUp": true
+  }
+}

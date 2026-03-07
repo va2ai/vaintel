@@ -1,0 +1,154 @@
+{
+  "sources": [
+    {
+      "id": "federal-register-va",
+      "name": "Federal Register - VA Rules & Regulations",
+      "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=veterans-affairs-department&order=newest",
+      "type": "api",
+      "category": "regulations",
+      "checkInterval": 12,
+      "reliability": 10,
+      "notes": "Official federal rulemaking. JSON API returns VA-related proposed and final rules. Highest authority source."
+    },
+    {
+      "id": "va-news",
+      "name": "VA.gov News Releases",
+      "url": "https://news.va.gov/feed/",
+      "type": "rss",
+      "category": "official",
+      "checkInterval": 6,
+      "reliability": 9,
+      "notes": "Official VA press releases and news. RSS feed. Covers policy changes, benefits updates, facility news."
+    },
+    {
+      "id": "cavc-decisions",
+      "name": "CAVC Decisions",
+      "url": "https://www.uscourts.cavc.gov/opinions.php",
+      "type": "web",
+      "category": "legal",
+      "checkInterval": 24,
+      "reliability": 10,
+      "notes": "Court of Appeals for Veterans Claims opinions. Must scrape HTML. Precedential decisions shape VA claims law."
+    },
+    {
+      "id": "bva-decisions",
+      "name": "BVA Decisions",
+      "url": "https://www.index.va.gov/search/va/bva.jsp",
+      "type": "web",
+      "category": "legal",
+      "checkInterval": 24,
+      "reliability": 9,
+      "notes": "Board of Veterans Appeals decisions search. High volume, useful for trend analysis. Web scrape required."
+    },
+    {
+      "id": "congress-veterans",
+      "name": "Congress.gov - Veterans Legislation",
+      "url": "https://www.congress.gov/search?q=%7B%22source%22%3A%22legislation%22%2C%22subject%22%3A%22Armed+forces+and+national+security%22%7D&searchResultViewType=expanded",
+      "type": "web",
+      "category": "legislation",
+      "checkInterval": 24,
+      "reliability": 10,
+      "notes": "Congressional legislation related to veterans affairs. Tracks new bills, amendments, and votes. Web scrape."
+    },
+    {
+      "id": "military-com-veterans",
+      "name": "Military.com Veterans News",
+      "url": "https://www.military.com/benefits/veteran-benefits/rss",
+      "type": "rss",
+      "category": "news",
+      "checkInterval": 6,
+      "reliability": 7,
+      "notes": "Popular military/veteran news outlet. RSS feed. Covers benefits, claims tips, policy changes. Some editorial slant."
+    },
+    {
+      "id": "stars-and-stripes",
+      "name": "Stars and Stripes - Veterans",
+      "url": "https://www.stripes.com/theaters/us/rss",
+      "type": "rss",
+      "category": "news",
+      "checkInterval": 12,
+      "reliability": 8,
+      "notes": "Independent military newspaper. RSS feed. Editorially independent, credible reporting on veteran issues."
+    },
+    {
+      "id": "vfw-news",
+      "name": "VFW News & Media",
+      "url": "https://www.vfw.org/media-and-events/latest-releases",
+      "type": "web",
+      "category": "vso",
+      "checkInterval": 24,
+      "reliability": 7,
+      "notes": "Veterans of Foreign Wars press releases. VSO perspective on policy. Web scrape required."
+    },
+    {
+      "id": "dav-news",
+      "name": "DAV News",
+      "url": "https://www.dav.org/learn-more/news/",
+      "type": "web",
+      "category": "vso",
+      "checkInterval": 24,
+      "reliability": 7,
+      "notes": "Disabled American Veterans news. Strong advocacy focus on disability claims and benefits. Web scrape."
+    },
+    {
+      "id": "american-legion",
+      "name": "American Legion News",
+      "url": "https://www.legion.org/RSS/news",
+      "type": "rss",
+      "category": "vso",
+      "checkInterval": 24,
+      "reliability": 7,
+      "notes": "American Legion news feed. Covers legislation, benefits, veteran services. RSS feed."
+    },
+    {
+      "id": "reddit-veterans-benefits",
+      "name": "Reddit r/VeteransBenefits",
+      "url": "https://www.reddit.com/r/VeteransBenefits/hot.json",
+      "type": "api",
+      "category": "community",
+      "checkInterval": 4,
+      "reliability": 4,
+      "notes": "Community discussions on VA benefits. JSON API. High volume, low reliability but excellent for trend detection and real veteran experiences. User-agent header required."
+    },
+    {
+      "id": "va-oig-reports",
+      "name": "VA Office of Inspector General Reports",
+      "url": "https://www.va.gov/oig/publications/reports-list.asp",
+      "type": "web",
+      "category": "oversight",
+      "checkInterval": 48,
+      "reliability": 10,
+      "notes": "Inspector General reports on VA waste, fraud, abuse, and systemic issues. High impact, lower frequency. Web scrape."
+    },
+    {
+      "id": "bva-api-decisions",
+      "name": "BVA Decision Search API (V2V)",
+      "url": "https://bva-api-524576132881.us-central1.run.app",
+      "type": "bva-api",
+      "category": "legal",
+      "checkInterval": 12,
+      "reliability": 9,
+      "notes": "V2V's own BVA API. Searches BVA decisions, extracts case metadata, runs regex presets (nexus opinions, CFR citations, diagnostic codes, TDIU, CUE). Also has CAVC eFiling search for court records, docket reports, and documents.",
+      "apiEndpoints": {
+        "search": "/search",
+        "case": "/case",
+        "caseText": "/case/text",
+        "caseSearch": "/case/search",
+        "presets": "/case/search/presets",
+        "analyzeText": "/analyze/text",
+        "batchSearch": "/batch/search",
+        "cavcSearch": "/cavc/search",
+        "cavcCase": "/cavc/case",
+        "health": "/health"
+      },
+      "defaultQueries": [
+        "TDIU unemployability",
+        "PTSD combat",
+        "sleep apnea nexus",
+        "hearing loss tinnitus",
+        "secondary service connection",
+        "clear and unmistakable error"
+      ]
+    }
+  ]
+}

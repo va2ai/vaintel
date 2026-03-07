@@ -1,0 +1,215 @@
+{
+  "contentTypes": {
+    "cavc-analysis": {
+      "outputSchema": "post",
+      "section": "cavc",
+      "category": "CAVC Decision",
+      "description": "Deep analysis of a Court of Appeals for Veterans Claims decision, explaining its holding, implications, and how veterans can use it",
+      "requiredFields": ["id", "section", "category", "date", "title", "excerpt", "author", "summary", "readTime", "featured", "tags", "body", "heroImage"],
+      "fieldConstraints": {
+        "title": { "maxLength": 120, "pattern": "Include case name and key implication" },
+        "excerpt": { "maxLength": 280, "sentences": "1-2", "requirement": "Must convey the holding and why it matters" },
+        "summary": { "maxLength": 500, "sentences": "2-4", "requirement": "Expand on excerpt with regulatory context" },
+        "body": { "minWords": 1500, "targetWords": 2500, "maxWords": 3500 },
+        "tags": { "minCount": 3, "maxCount": 6, "mustInclude": ["CAVC"] },
+        "author": { "default": "Chris Combs" }
+      },
+      "requiredSections": [
+        { "heading": "What the Court Actually Held", "emoji": ":gavel:", "purpose": "Plain-language summary of the holding" },
+        { "heading": "The Regulatory Framework", "emoji": ":book:", "purpose": "Explain the CFR sections or statutes the decision interprets" },
+        { "heading": "What Went Wrong", "emoji": ":search:", "purpose": "Narrative of the case facts and the error the Board made" },
+        { "heading": "Why This Decision Matters", "emoji": ":shield:", "purpose": "Practical impact on veterans claims broadly" },
+        { "heading": "How to Use This in Your Claim", "emoji": ":target:", "purpose": "Tactical advice for citing and applying the decision" },
+        { "heading": "The Bottom Line", "emoji": ":medal:", "purpose": "Concise summary with action items callout" }
+      ],
+      "requiredCallouts": ["important", "tip", "check"],
+      "toneEmphasis": "analytical, precise, empowering",
+      "temperature": 0.7
+    },
+    "policy-update": {
+      "outputSchema": "post",
+      "section": "va-policy",
+      "category": "VA Policy",
+      "description": "Analysis of a VA policy change, regulatory update, or M21-1 revision with practical implications",
+      "requiredFields": ["id", "section", "category", "date", "title", "excerpt", "author", "summary", "readTime", "featured", "tags", "body", "heroImage"],
+      "fieldConstraints": {
+        "title": { "maxLength": 120, "pattern": "Name the policy change and its impact" },
+        "excerpt": { "maxLength": 280, "sentences": "1-2" },
+        "summary": { "maxLength": 500, "sentences": "2-4" },
+        "body": { "minWords": 1000, "targetWords": 1800, "maxWords": 2500 },
+        "tags": { "minCount": 3, "maxCount": 6, "mustInclude": ["Policy"] },
+        "author": { "default": "Chris Combs" }
+      },
+      "requiredSections": [
+        { "heading": "What Changed", "emoji": ":gavel:", "purpose": "The specific policy change with citations" },
+        { "heading": "What It Means", "emoji": ":search:", "purpose": "Analysis of implications" },
+        { "heading": "Who Is Affected", "emoji": ":shield:", "purpose": "Which veterans and claim types are impacted" },
+        { "heading": "What You Should Do", "emoji": ":target:", "purpose": "Actionable guidance" },
+        { "heading": "The Bottom Line", "emoji": ":medal:", "purpose": "Summary with action items" }
+      ],
+      "requiredCallouts": ["important", "tip"],
+      "toneEmphasis": "informative, watchdog, skeptical",
+      "temperature": 0.5
+    },
+    "claims-strategy": {
+      "outputSchema": "post",
+      "section": "claims-strategy",
+      "category": "Claims Strategy",
+      "description": "Tactical guide for a specific claims strategy, appeal approach, or evidence-building technique",
+      "requiredFields": ["id", "section", "category", "date", "title", "excerpt", "author", "summary", "readTime", "featured", "tags", "body", "heroImage"],
+      "fieldConstraints": {
+        "title": { "maxLength": 120, "pattern": "Name the strategy and hint at the outcome" },
+        "excerpt": { "maxLength": 280, "sentences": "1-2" },
+        "summary": { "maxLength": 500, "sentences": "2-4" },
+        "body": { "minWords": 1200, "targetWords": 2000, "maxWords": 3000 },
+        "tags": { "minCount": 3, "maxCount": 6 },
+        "author": { "default": "Chris Combs" }
+      },
+      "requiredSections": [
+        { "heading": "The Strategy", "emoji": ":target:", "purpose": "Clear statement of what the strategy is" },
+        { "heading": "The Regulatory Basis", "emoji": ":book:", "purpose": "Why this works — CFR and caselaw support" },
+        { "heading": "Step-by-Step Implementation", "emoji": ":tools:", "purpose": "Detailed how-to" },
+        { "heading": "Evidence You Need", "emoji": ":doc:", "purpose": "What to gather and submit" },
+        { "heading": "Common Pitfalls", "emoji": ":flag:", "purpose": "Mistakes that derail this strategy" },
+        { "heading": "The Bottom Line", "emoji": ":medal:", "purpose": "Summary with action items" }
+      ],
+      "requiredCallouts": ["tip", "warning", "check"],
+      "toneEmphasis": "tactical, empowering, step-by-step",
+      "temperature": 0.6
+    },
+    "explainer": {
+      "outputSchema": "post",
+      "section": "explainers",
+      "category": "Rating Explainer",
+      "description": "Educational deep-dive explaining a VA disability concept, regulation, or process",
+      "requiredFields": ["id", "section", "category", "date", "title", "excerpt", "author", "summary", "readTime", "featured", "tags", "body", "heroImage"],
+      "fieldConstraints": {
+        "title": { "maxLength": 120, "pattern": "Name the topic clearly — can use 'Explained' or question format" },
+        "excerpt": { "maxLength": 280, "sentences": "1-2" },
+        "summary": { "maxLength": 500, "sentences": "2-4" },
+        "body": { "minWords": 1200, "targetWords": 2000, "maxWords": 3000 },
+        "tags": { "minCount": 3, "maxCount": 6 },
+        "author": { "default": "Chris Combs" }
+      },
+      "requiredSections": [
+        { "heading": "What Is [Topic]", "emoji": ":book:", "purpose": "Clear definition and context" },
+        { "heading": "How It Actually Works", "emoji": ":search:", "purpose": "Mechanics in practice, not just theory" },
+        { "heading": "Key Details Most Veterans Miss", "emoji": ":star:", "purpose": "Non-obvious insights" },
+        { "heading": "Common Misconceptions", "emoji": ":flag:", "purpose": "Correct widespread misunderstandings" },
+        { "heading": "What This Means for Your Claim", "emoji": ":target:", "purpose": "Practical application" },
+        { "heading": "The Bottom Line", "emoji": ":medal:", "purpose": "Summary with action items" }
+      ],
+      "requiredCallouts": ["important", "tip"],
+      "toneEmphasis": "educational, patient, thorough",
+      "temperature": 0.5
+    },
+    "opinion": {
+      "outputSchema": "post",
+      "section": "opinion",
+      "category": "Opinion",
+      "description": "Opinionated analysis or commentary on a VA disability claims topic, clearly labeled as opinion",
+      "requiredFields": ["id", "section", "category", "date", "title", "excerpt", "author", "summary", "readTime", "featured", "tags", "body", "heroImage"],
+      "fieldConstraints": {
+        "title": { "maxLength": 120, "pattern": "Take a clear position in the title" },
+        "excerpt": { "maxLength": 280, "sentences": "1-2" },
+        "summary": { "maxLength": 500, "sentences": "2-4" },
+        "body": { "minWords": 800, "targetWords": 1500, "maxWords": 2000 },
+        "tags": { "minCount": 3, "maxCount": 6, "mustInclude": ["Opinion"] },
+        "author": { "default": "Chris Combs" }
+      },
+      "requiredSections": [
+        { "heading": "The Problem", "emoji": ":fire:", "purpose": "Clear thesis statement" },
+        { "heading": "The Evidence", "emoji": ":search:", "purpose": "Data and citations supporting the thesis" },
+        { "heading": "The Other Side", "emoji": ":shield:", "purpose": "Honest acknowledgment of counterarguments" },
+        { "heading": "What Should Change", "emoji": ":target:", "purpose": "Specific recommendations" },
+        { "heading": "The Bottom Line", "emoji": ":medal:", "purpose": "Summary and call to action" }
+      ],
+      "requiredCallouts": ["important"],
+      "toneEmphasis": "opinionated, passionate, evidence-backed",
+      "temperature": 0.8
+    },
+    "news": {
+      "outputSchema": "news",
+      "category": "Policy|Legal|Benefits|Congress",
+      "description": "Timely news coverage of VA disability claims developments",
+      "requiredFields": ["id", "category", "date", "timestamp", "title", "excerpt", "summary", "body"],
+      "optionalFields": ["author", "readTime", "breaking", "tags", "heroImage", "relatedPostId"],
+      "fieldConstraints": {
+        "id": { "pattern": "n###", "autoGenerate": true },
+        "title": { "maxLength": 120, "pattern": "Lead with the news, not analysis" },
+        "excerpt": { "maxLength": 280, "sentences": "1-2" },
+        "summary": { "maxLength": 500, "sentences": "2-3" },
+        "body": { "minWords": 500, "targetWords": 1000, "maxWords": 1500 },
+        "tags": { "minCount": 2, "maxCount": 5 },
+        "author": { "default": "Chris Combs" },
+        "category": { "enum": ["Policy", "Legal", "Benefits", "Congress", "Claims Data", "PACT Act", "Rating Schedule", "COLA"] }
+      },
+      "requiredSections": [
+        { "heading": "[What Happened]", "emoji": ":gavel: or :fire:", "purpose": "The news event" },
+        { "heading": "[Context/Analysis]", "emoji": ":search:", "purpose": "Background and meaning" },
+        { "heading": "What This Means for Veterans", "emoji": ":target:", "purpose": "Practical impact" }
+      ],
+      "requiredCallouts": ["important"],
+      "toneEmphasis": "factual, timely, concise",
+      "temperature": 0.3
+    },
+    "guide-update": {
+      "outputSchema": "guide-section",
+      "description": "New section or update to an existing guide",
+      "requiredFields": ["guideId", "heading", "content"],
+      "fieldConstraints": {
+        "heading": { "maxLength": 80 },
+        "content": { "minWords": 500, "targetWords": 1500, "maxWords": 3000, "format": "markdown" }
+      },
+      "toneEmphasis": "educational, comprehensive, reference-quality",
+      "temperature": 0.4
+    }
+  },
+  "postSchema": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "integer", "description": "Auto-incremented post ID" },
+      "section": { "type": "string", "enum": ["cavc", "va-policy", "claims-strategy", "explainers", "opinion"] },
+      "category": { "type": "string", "enum": ["CAVC Decision", "VA Policy", "Claims Strategy", "Rating Explainer", "Opinion"] },
+      "date": { "type": "string", "format": "MMM D, YYYY", "example": "Mar 4, 2026" },
+      "title": { "type": "string" },
+      "excerpt": { "type": "string" },
+      "author": { "type": "string", "default": "Chris Combs" },
+      "summary": { "type": "string" },
+      "readTime": { "type": "string", "format": "N min" },
+      "featured": { "type": "boolean", "default": false },
+      "tags": { "type": "array", "items": { "type": "string" } },
+      "body": { "type": "string", "format": "markdown" },
+      "heroImage": { "type": "string", "format": "path", "pattern": "/images/post-SLUG-hero.png" }
+    },
+    "required": ["id", "section", "category", "date", "title", "excerpt", "author", "summary", "readTime", "featured", "tags", "body"]
+  },
+  "newsSchema": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "string", "pattern": "^n\\d{3}$" },
+      "category": { "type": "string" },
+      "date": { "type": "string", "format": "MMM D, YYYY" },
+      "timestamp": { "type": "string", "format": "ISO 8601" },
+      "title": { "type": "string" },
+      "excerpt": { "type": "string" },
+      "summary": { "type": "string" },
+      "body": { "type": "string", "format": "markdown" },
+      "author": { "type": "string", "default": "Chris Combs" },
+      "readTime": { "type": "string" },
+      "breaking": { "type": "boolean", "default": false },
+      "tags": { "type": "array", "items": { "type": "string" } },
+      "heroImage": { "type": "string" },
+      "relatedPostId": { "type": ["integer", "null"] }
+    },
+    "required": ["id", "category", "date", "timestamp", "title", "excerpt", "summary", "body"]
+  },
+  "tagTaxonomy": {
+    "legal": ["CAVC", "Precedent", "Federal Circuit", "BVA", "Caselaw"],
+    "conditions": ["TDIU", "PTSD", "TBI", "MST", "Sleep Apnea", "Tinnitus", "Back Pain", "Knee", "Mental Health"],
+    "process": ["C&P Exam", "Nexus Letter", "Buddy Statement", "Evidence", "Appeals", "HLR", "Supplemental Claim"],
+    "policy": ["Policy", "Ratings", "Legislation", "PACT Act", "Rating Schedule", "COLA", "M21-1"],
+    "strategy": ["Secondary Connection", "Aggravation", "TDIU", "Individual Unemployability", "Increase", "New Claim"],
+    "meta": ["Opinion", "Data", "Claims Data", "Processing", "Backlog", "GAO"]
+  }
+}
