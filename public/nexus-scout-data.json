@@ -1,0 +1,514 @@
+{
+  "conditions": [
+    {
+      "id": "ptsd",
+      "name": "PTSD",
+      "dc": "9411",
+      "cfr": "38 CFR 4.130",
+      "prevalence": "Most claimed mental health condition among veterans",
+      "secondaries": [
+        {
+          "id": "sleep-apnea",
+          "name": "Sleep Apnea",
+          "dc": "6847",
+          "cfr": "38 CFR 4.97",
+          "relationship": "Medical literature establishes that PTSD medications and hyperarousal symptoms disrupt sleep architecture, contributing to obstructive sleep apnea. Studies show veterans with PTSD have significantly higher rates of sleep-disordered breathing.",
+          "strength": "strong",
+          "searchQuery": "PTSD secondary sleep apnea service connection",
+          "searchKeywords": ["PTSD", "sleep apnea", "secondary", "service connection"]
+        },
+        {
+          "id": "migraines",
+          "name": "Migraines",
+          "dc": "8100",
+          "cfr": "38 CFR 4.124a",
+          "relationship": "Chronic stress and hypervigilance associated with PTSD trigger vascular changes and neurological dysfunction leading to migraine headaches. Research shows PTSD patients have 3x higher migraine prevalence.",
+          "strength": "strong",
+          "searchQuery": "PTSD secondary migraine headaches service connection",
+          "searchKeywords": ["PTSD", "migraine", "headaches", "secondary", "service connection"]
+        },
+        {
+          "id": "gerd",
+          "name": "GERD",
+          "dc": "7346",
+          "cfr": "38 CFR 4.114",
+          "relationship": "PTSD-related anxiety increases gastric acid production and disrupts gastrointestinal motility. Psychiatric medications commonly prescribed for PTSD are also known to relax the lower esophageal sphincter.",
+          "strength": "moderate",
+          "searchQuery": "PTSD secondary GERD gastroesophageal reflux service connection",
+          "searchKeywords": ["PTSD", "GERD", "reflux", "secondary", "service connection"]
+        },
+        {
+          "id": "hypertension",
+          "name": "Hypertension",
+          "dc": "7101",
+          "cfr": "38 CFR 4.104",
+          "relationship": "Chronic sympathetic nervous system activation from PTSD elevates blood pressure over time. The sustained fight-or-flight response and cortisol dysregulation contribute to cardiovascular disease including hypertension.",
+          "strength": "moderate",
+          "searchQuery": "PTSD secondary hypertension high blood pressure service connection",
+          "searchKeywords": ["PTSD", "hypertension", "blood pressure", "secondary", "service connection"]
+        },
+        {
+          "id": "erectile-dysfunction",
+          "name": "Erectile Dysfunction",
+          "dc": "7522",
+          "cfr": "38 CFR 4.115b",
+          "relationship": "PTSD medications (SSRIs, SNRIs) commonly cause sexual dysfunction as a side effect. Additionally, PTSD-related anxiety and stress hormones directly impair sexual function.",
+          "strength": "strong",
+          "searchQuery": "PTSD secondary erectile dysfunction medication side effect service connection",
+          "searchKeywords": ["PTSD", "erectile dysfunction", "medication", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "tinnitus",
+      "name": "Tinnitus",
+      "dc": "6260",
+      "cfr": "38 CFR 4.87",
+      "prevalence": "Most commonly service-connected disability overall",
+      "secondaries": [
+        {
+          "id": "depression",
+          "name": "Depression",
+          "dc": "9434",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Chronic, unrelenting tinnitus causes significant psychological distress. The constant ringing leads to sleep deprivation, social isolation, and difficulty concentrating, all contributing to major depressive disorder.",
+          "strength": "strong",
+          "searchQuery": "tinnitus secondary depression mental health service connection",
+          "searchKeywords": ["tinnitus", "depression", "mental health", "secondary", "service connection"]
+        },
+        {
+          "id": "anxiety",
+          "name": "Anxiety Disorder",
+          "dc": "9400",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Persistent tinnitus triggers anxiety through constant hypervigilance to auditory stimuli. Veterans report heightened startle response and inability to find quiet, leading to generalized anxiety disorder.",
+          "strength": "strong",
+          "searchQuery": "tinnitus secondary anxiety disorder service connection",
+          "searchKeywords": ["tinnitus", "anxiety", "secondary", "service connection"]
+        },
+        {
+          "id": "insomnia",
+          "name": "Insomnia",
+          "dc": "9432",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Tinnitus directly disrupts sleep onset and maintenance. The perception of ringing is amplified in quiet environments, making it particularly difficult to fall asleep and causing chronic sleep disorders.",
+          "strength": "strong",
+          "searchQuery": "tinnitus secondary insomnia sleep disorder service connection",
+          "searchKeywords": ["tinnitus", "insomnia", "sleep", "secondary", "service connection"]
+        },
+        {
+          "id": "migraines-tinnitus",
+          "name": "Migraines",
+          "dc": "8100",
+          "cfr": "38 CFR 4.124a",
+          "relationship": "Tinnitus and migraines share neurological pathways involving central sensitization. The constant auditory stimulation from tinnitus can trigger or worsen migraine episodes through sensory overload.",
+          "strength": "moderate",
+          "searchQuery": "tinnitus secondary migraine headaches service connection",
+          "searchKeywords": ["tinnitus", "migraine", "headaches", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "lumbar-spine",
+      "name": "Lumbar Spine (Low Back)",
+      "dc": "5237",
+      "cfr": "38 CFR 4.71a",
+      "prevalence": "Among the most common musculoskeletal claims",
+      "secondaries": [
+        {
+          "id": "radiculopathy-lower",
+          "name": "Lower Extremity Radiculopathy",
+          "dc": "8520",
+          "cfr": "38 CFR 4.124a",
+          "relationship": "Degenerative disc disease and herniated discs in the lumbar spine compress nerve roots, causing radiculopathy (sciatica) with pain, numbness, and weakness radiating into the legs.",
+          "strength": "strong",
+          "searchQuery": "lumbar spine secondary radiculopathy sciatica lower extremity service connection",
+          "searchKeywords": ["lumbar", "radiculopathy", "sciatica", "secondary", "service connection"]
+        },
+        {
+          "id": "knee-secondary",
+          "name": "Knee Condition",
+          "dc": "5260",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Altered gait mechanics from chronic low back pain place abnormal stress on the knees. Compensatory weight shifting and limping cause accelerated wear and degenerative joint disease in one or both knees.",
+          "strength": "moderate",
+          "searchQuery": "lumbar spine secondary knee condition altered gait service connection",
+          "searchKeywords": ["lumbar", "knee", "altered gait", "secondary", "service connection"]
+        },
+        {
+          "id": "hip-condition",
+          "name": "Hip Condition",
+          "dc": "5252",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Chronic lumbar spine dysfunction causes compensatory biomechanical changes that transfer stress to the hip joints. Antalgic gait from back pain leads to uneven hip loading and degeneration.",
+          "strength": "moderate",
+          "searchQuery": "lumbar spine secondary hip condition altered gait service connection",
+          "searchKeywords": ["lumbar", "hip", "altered gait", "secondary", "service connection"]
+        },
+        {
+          "id": "depression-back",
+          "name": "Depression",
+          "dc": "9434",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Chronic pain from lumbar spine conditions is well-established as a cause of major depressive disorder. The inability to perform daily activities, work limitations, and constant pain significantly impact mental health.",
+          "strength": "strong",
+          "searchQuery": "lumbar spine chronic pain secondary depression mental health service connection",
+          "searchKeywords": ["lumbar", "chronic pain", "depression", "secondary", "service connection"]
+        },
+        {
+          "id": "cervical-spine",
+          "name": "Cervical Spine Condition",
+          "dc": "5242",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Compensatory postural changes from lumbar spine disability place increased mechanical stress on the cervical spine. Veterans unconsciously alter posture to minimize low back pain, accelerating cervical degeneration.",
+          "strength": "moderate",
+          "searchQuery": "lumbar spine secondary cervical spine compensatory posture service connection",
+          "searchKeywords": ["lumbar", "cervical", "spine", "compensatory", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "knee",
+      "name": "Knee Condition",
+      "dc": "5260",
+      "cfr": "38 CFR 4.71a",
+      "prevalence": "One of the most commonly rated musculoskeletal disabilities",
+      "secondaries": [
+        {
+          "id": "opposite-knee",
+          "name": "Opposite Knee Condition",
+          "dc": "5260",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Favoring the injured knee shifts weight and mechanical stress to the contralateral knee. This compensatory overloading accelerates cartilage breakdown and causes degenerative joint disease in the opposite knee.",
+          "strength": "strong",
+          "searchQuery": "knee secondary opposite contralateral knee condition altered gait service connection",
+          "searchKeywords": ["knee", "contralateral", "opposite", "altered gait", "secondary", "service connection"]
+        },
+        {
+          "id": "hip-from-knee",
+          "name": "Hip Condition",
+          "dc": "5252",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Knee instability and limited range of motion cause compensatory gait changes that redistribute forces through the hip joint. Chronic limping from knee pain accelerates hip joint degeneration.",
+          "strength": "moderate",
+          "searchQuery": "knee secondary hip condition altered gait compensatory service connection",
+          "searchKeywords": ["knee", "hip", "altered gait", "secondary", "service connection"]
+        },
+        {
+          "id": "back-from-knee",
+          "name": "Lumbar Spine Condition",
+          "dc": "5237",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Antalgic gait from chronic knee pain disrupts normal spinal alignment and places asymmetric loads on the lumbar spine. Compensatory movement patterns lead to disc degeneration and chronic low back pain.",
+          "strength": "moderate",
+          "searchQuery": "knee secondary lumbar spine back condition altered gait service connection",
+          "searchKeywords": ["knee", "lumbar", "back", "altered gait", "secondary", "service connection"]
+        },
+        {
+          "id": "ankle-from-knee",
+          "name": "Ankle Condition",
+          "dc": "5271",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Knee instability and altered biomechanics change how force is transmitted through the ankle joint. Compensatory foot placement patterns and abnormal pronation lead to ankle joint degeneration.",
+          "strength": "moderate",
+          "searchQuery": "knee secondary ankle condition altered gait biomechanics service connection",
+          "searchKeywords": ["knee", "ankle", "altered gait", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "hearing-loss",
+      "name": "Hearing Loss",
+      "dc": "6100",
+      "cfr": "38 CFR 4.85",
+      "prevalence": "Second most commonly service-connected disability",
+      "secondaries": [
+        {
+          "id": "tinnitus-from-hl",
+          "name": "Tinnitus",
+          "dc": "6260",
+          "cfr": "38 CFR 4.87",
+          "relationship": "Sensorineural hearing loss and tinnitus frequently co-occur as both result from damage to cochlear hair cells. The brain's attempt to compensate for missing auditory input produces phantom sounds perceived as tinnitus.",
+          "strength": "strong",
+          "searchQuery": "hearing loss secondary tinnitus cochlear damage service connection",
+          "searchKeywords": ["hearing loss", "tinnitus", "secondary", "service connection"]
+        },
+        {
+          "id": "depression-hl",
+          "name": "Depression",
+          "dc": "9434",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Progressive hearing loss leads to social isolation, communication difficulties, and withdrawal from activities. The resulting loneliness and frustration are well-documented causes of depression in veterans.",
+          "strength": "strong",
+          "searchQuery": "hearing loss secondary depression social isolation service connection",
+          "searchKeywords": ["hearing loss", "depression", "isolation", "secondary", "service connection"]
+        },
+        {
+          "id": "anxiety-hl",
+          "name": "Anxiety Disorder",
+          "dc": "9400",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Difficulty hearing in social and professional settings causes anticipatory anxiety. Veterans with hearing loss report significant stress about misunderstanding conversations and missing important sounds.",
+          "strength": "moderate",
+          "searchQuery": "hearing loss secondary anxiety disorder service connection",
+          "searchKeywords": ["hearing loss", "anxiety", "secondary", "service connection"]
+        },
+        {
+          "id": "vertigo",
+          "name": "Vertigo / Vestibular Disorder",
+          "dc": "6204",
+          "cfr": "38 CFR 4.87",
+          "relationship": "Inner ear damage that causes hearing loss often affects the vestibular system as well. Damage to cochlear structures frequently extends to adjacent vestibular organs, causing balance problems and vertigo.",
+          "strength": "moderate",
+          "searchQuery": "hearing loss secondary vertigo vestibular disorder inner ear service connection",
+          "searchKeywords": ["hearing loss", "vertigo", "vestibular", "inner ear", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "migraines",
+      "name": "Migraines",
+      "dc": "8100",
+      "cfr": "38 CFR 4.124a",
+      "prevalence": "Common among post-deployment veterans, often linked to TBI",
+      "secondaries": [
+        {
+          "id": "depression-migraine",
+          "name": "Depression",
+          "dc": "9434",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Chronic, debilitating migraines significantly impact quality of life and functional capacity. Repeated episodes of prostrating pain, lost workdays, and inability to participate in activities lead to depressive disorders.",
+          "strength": "strong",
+          "searchQuery": "migraine secondary depression chronic pain service connection",
+          "searchKeywords": ["migraine", "depression", "chronic pain", "secondary", "service connection"]
+        },
+        {
+          "id": "insomnia-migraine",
+          "name": "Insomnia",
+          "dc": "9432",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Migraine pain disrupts normal sleep patterns, and poor sleep quality in turn triggers more migraines. This bidirectional relationship creates a cycle of chronic sleep disruption.",
+          "strength": "moderate",
+          "searchQuery": "migraine secondary insomnia sleep disorder service connection",
+          "searchKeywords": ["migraine", "insomnia", "sleep", "secondary", "service connection"]
+        },
+        {
+          "id": "neck-tension",
+          "name": "Cervical Spine / Neck Tension",
+          "dc": "5242",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Chronic migraines cause persistent cervical muscle tension and spasm. The neurological pathways between migraine and cervical spine dysfunction are well-established, with each condition aggravating the other.",
+          "strength": "moderate",
+          "searchQuery": "migraine secondary cervical spine neck tension service connection",
+          "searchKeywords": ["migraine", "cervical", "neck", "tension", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "cervical-spine",
+      "name": "Cervical Spine (Neck)",
+      "dc": "5242",
+      "cfr": "38 CFR 4.71a",
+      "prevalence": "Common among combat veterans and those with heavy equipment MOS",
+      "secondaries": [
+        {
+          "id": "radiculopathy-upper",
+          "name": "Upper Extremity Radiculopathy",
+          "dc": "8510",
+          "cfr": "38 CFR 4.124a",
+          "relationship": "Degenerative disc disease and herniated discs in the cervical spine compress nerve roots exiting the spinal column. This causes radiculopathy with pain, numbness, tingling, and weakness in the arms and hands.",
+          "strength": "strong",
+          "searchQuery": "cervical spine secondary radiculopathy upper extremity nerve compression service connection",
+          "searchKeywords": ["cervical", "radiculopathy", "upper extremity", "nerve", "secondary", "service connection"]
+        },
+        {
+          "id": "migraines-cervical",
+          "name": "Migraines / Headaches",
+          "dc": "8100",
+          "cfr": "38 CFR 4.124a",
+          "relationship": "Cervical spine dysfunction causes cervicogenic headaches through nerve irritation and muscle tension in the neck. Cervical nerve root compression and facet joint dysfunction directly trigger migraine-type headaches.",
+          "strength": "strong",
+          "searchQuery": "cervical spine secondary migraine headaches cervicogenic service connection",
+          "searchKeywords": ["cervical", "migraine", "headaches", "cervicogenic", "secondary", "service connection"]
+        },
+        {
+          "id": "shoulder-cervical",
+          "name": "Shoulder Condition",
+          "dc": "5201",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Cervical spine restrictions alter shoulder biomechanics as the body compensates for limited neck mobility. Nerve compression from cervical disc disease can also cause referred shoulder pain and weakness.",
+          "strength": "moderate",
+          "searchQuery": "cervical spine secondary shoulder condition nerve compression service connection",
+          "searchKeywords": ["cervical", "shoulder", "nerve compression", "secondary", "service connection"]
+        },
+        {
+          "id": "thoracic-outlet",
+          "name": "Thoracic Outlet Syndrome",
+          "dc": "8510",
+          "cfr": "38 CFR 4.124a",
+          "relationship": "Cervical spine degeneration and postural changes compress the neurovascular bundle in the thoracic outlet. Muscle spasm and structural changes in the cervical region contribute to nerve and vessel compression.",
+          "strength": "emerging",
+          "searchQuery": "cervical spine secondary thoracic outlet syndrome nerve compression service connection",
+          "searchKeywords": ["cervical", "thoracic outlet", "nerve compression", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "shoulder",
+      "name": "Shoulder Condition",
+      "dc": "5201",
+      "cfr": "38 CFR 4.71a",
+      "prevalence": "Common in combat veterans and physically demanding MOS",
+      "secondaries": [
+        {
+          "id": "cervical-from-shoulder",
+          "name": "Cervical Spine Condition",
+          "dc": "5242",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Chronic shoulder pain and limited range of motion cause compensatory cervical spine positioning. Guarding and splinting behaviors alter neck mechanics and accelerate cervical degeneration.",
+          "strength": "moderate",
+          "searchQuery": "shoulder secondary cervical spine neck compensatory service connection",
+          "searchKeywords": ["shoulder", "cervical", "neck", "compensatory", "secondary", "service connection"]
+        },
+        {
+          "id": "opposite-shoulder",
+          "name": "Opposite Shoulder Condition",
+          "dc": "5201",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Favoring the injured shoulder forces overuse of the contralateral shoulder for lifting, carrying, and overhead activities. This compensatory overloading causes accelerated wear and rotator cuff pathology.",
+          "strength": "moderate",
+          "searchQuery": "shoulder secondary opposite contralateral shoulder overuse service connection",
+          "searchKeywords": ["shoulder", "contralateral", "opposite", "overuse", "secondary", "service connection"]
+        },
+        {
+          "id": "depression-shoulder",
+          "name": "Depression",
+          "dc": "9434",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Chronic shoulder pain limits daily activities, employment capacity, and recreational pursuits. The functional limitations and constant pain are documented contributors to depressive disorders.",
+          "strength": "moderate",
+          "searchQuery": "shoulder chronic pain secondary depression service connection",
+          "searchKeywords": ["shoulder", "chronic pain", "depression", "secondary", "service connection"]
+        },
+        {
+          "id": "elbow-from-shoulder",
+          "name": "Elbow Condition",
+          "dc": "5206",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Shoulder dysfunction alters the mechanics of the entire upper extremity kinetic chain. Compensatory elbow loading during activities that normally engage the shoulder leads to overuse injuries.",
+          "strength": "emerging",
+          "searchQuery": "shoulder secondary elbow condition compensatory upper extremity service connection",
+          "searchKeywords": ["shoulder", "elbow", "compensatory", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "sleep-apnea",
+      "name": "Sleep Apnea",
+      "dc": "6847",
+      "cfr": "38 CFR 4.97",
+      "prevalence": "Rapidly growing among veteran claims, often linked to PTSD or weight gain from other conditions",
+      "secondaries": [
+        {
+          "id": "hypertension-sa",
+          "name": "Hypertension",
+          "dc": "7101",
+          "cfr": "38 CFR 4.104",
+          "relationship": "Obstructive sleep apnea causes repeated oxygen desaturation events that trigger sympathetic surges and vascular inflammation. This is one of the strongest evidence-based links -- untreated OSA is a recognized cause of resistant hypertension.",
+          "strength": "strong",
+          "searchQuery": "sleep apnea secondary hypertension high blood pressure service connection",
+          "searchKeywords": ["sleep apnea", "hypertension", "blood pressure", "secondary", "service connection"]
+        },
+        {
+          "id": "depression-sa",
+          "name": "Depression",
+          "dc": "9434",
+          "cfr": "38 CFR 4.130",
+          "relationship": "Chronic sleep fragmentation from sleep apnea disrupts neurotransmitter balance and causes daytime fatigue, cognitive impairment, and irritability -- all risk factors for major depressive disorder.",
+          "strength": "strong",
+          "searchQuery": "sleep apnea secondary depression chronic fatigue service connection",
+          "searchKeywords": ["sleep apnea", "depression", "fatigue", "secondary", "service connection"]
+        },
+        {
+          "id": "heart-disease",
+          "name": "Heart Disease",
+          "dc": "7005",
+          "cfr": "38 CFR 4.104",
+          "relationship": "Repetitive hypoxia from sleep apnea causes oxidative stress, systemic inflammation, and endothelial dysfunction. These mechanisms are established pathways to coronary artery disease, atrial fibrillation, and heart failure.",
+          "strength": "strong",
+          "searchQuery": "sleep apnea secondary heart disease cardiovascular service connection",
+          "searchKeywords": ["sleep apnea", "heart disease", "cardiovascular", "secondary", "service connection"]
+        },
+        {
+          "id": "stroke-risk",
+          "name": "Stroke / TIA",
+          "dc": "8008",
+          "cfr": "38 CFR 4.124a",
+          "relationship": "Sleep apnea increases stroke risk through hypertension, atrial fibrillation, and hypercoagulability. The repeated oxygen desaturation events damage blood vessels and promote clot formation.",
+          "strength": "emerging",
+          "searchQuery": "sleep apnea secondary stroke cerebrovascular service connection",
+          "searchKeywords": ["sleep apnea", "stroke", "cerebrovascular", "secondary", "service connection"]
+        }
+      ]
+    },
+    {
+      "id": "flat-feet",
+      "name": "Flat Feet (Pes Planus)",
+      "dc": "5276",
+      "cfr": "38 CFR 4.71a",
+      "prevalence": "Common service-connected condition from military footwear and marching",
+      "secondaries": [
+        {
+          "id": "plantar-fasciitis",
+          "name": "Plantar Fasciitis",
+          "dc": "5284",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Flat feet alter foot biomechanics, causing excessive pronation that stretches and inflames the plantar fascia. The collapsed arch directly increases tension on this connective tissue with every step.",
+          "strength": "strong",
+          "searchQuery": "flat feet pes planus secondary plantar fasciitis service connection",
+          "searchKeywords": ["flat feet", "pes planus", "plantar fasciitis", "secondary", "service connection"]
+        },
+        {
+          "id": "knee-from-feet",
+          "name": "Knee Condition",
+          "dc": "5260",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Flat feet cause abnormal lower extremity alignment through excessive pronation. This malalignment increases medial knee stress and accelerates cartilage wear, leading to patellofemoral syndrome and osteoarthritis.",
+          "strength": "strong",
+          "searchQuery": "flat feet secondary knee condition malalignment service connection",
+          "searchKeywords": ["flat feet", "knee", "malalignment", "pronation", "secondary", "service connection"]
+        },
+        {
+          "id": "ankle-from-feet",
+          "name": "Ankle Condition",
+          "dc": "5271",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "The excessive pronation from flat feet places abnormal stress on ankle ligaments and the tibialis posterior tendon. This leads to chronic ankle instability, tendinopathy, and degenerative changes.",
+          "strength": "strong",
+          "searchQuery": "flat feet secondary ankle condition instability pronation service connection",
+          "searchKeywords": ["flat feet", "ankle", "instability", "pronation", "secondary", "service connection"]
+        },
+        {
+          "id": "back-from-feet",
+          "name": "Lumbar Spine Condition",
+          "dc": "5237",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Flat feet disrupt the kinetic chain from ground up, causing leg length discrepancy effects, pelvic tilt, and increased lumbar lordosis. These biomechanical changes create chronic low back pain.",
+          "strength": "moderate",
+          "searchQuery": "flat feet secondary lumbar spine back pain biomechanics service connection",
+          "searchKeywords": ["flat feet", "lumbar", "back", "biomechanics", "secondary", "service connection"]
+        },
+        {
+          "id": "shin-splints",
+          "name": "Shin Splints / Tibial Stress",
+          "dc": "5262",
+          "cfr": "38 CFR 4.71a",
+          "relationship": "Flat feet increase tibial torsion and medial tibial stress during weight-bearing activities. The altered mechanics cause chronic medial tibial stress syndrome and may progress to stress fractures.",
+          "strength": "strong",
+          "searchQuery": "flat feet secondary shin splints tibial stress service connection",
+          "searchKeywords": ["flat feet", "shin splints", "tibial stress", "secondary", "service connection"]
+        }
+      ]
+    }
+  ]
+}

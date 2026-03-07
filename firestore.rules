@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdminEmail() {
+      return isSignedIn() && request.auth.token.email in [
+        "ccdmndkut2@gmail.com",
+        "ccdmndkut@gmail.com"
+      ];
+    }
+
+    function isContentDoc() {
+      return resource == null || resource.data is map;
+    }
+
+    match /posts/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminEmail() && isContentDoc();
+    }
+
+    match /articles/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminEmail() && isContentDoc();
+    }
+
+    match /guides/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminEmail() && isContentDoc();
+    }
+
+    match /news/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminEmail() && isContentDoc();
+    }
+
+    match /subscribers/{docId} {
+      allow create: if request.resource.data.keys().hasOnly(["email", "subscribedAt"])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() < 321;
+      allow read, update, delete: if isAdminEmail();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
