@@ -6,6 +6,7 @@ import BvaSearch from "./BvaSearch.jsx";
 import NexusScout from "./NexusScout.jsx";
 import Admin from "./Admin.jsx";
 import PricingPage from "./PricingPage.jsx";
+import DecisionDeconstructor from "./DecisionDeconstructor.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/nexus-scout" element={<NexusScout />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/decision-deconstructor" element={<DecisionDeconstructor />} />
         <Route path="/*" element={<V2VSite />} />
       </Routes>
     </BrowserRouter>

@@ -433,6 +433,9 @@ export default function BvaSearch() {
         {/* Header */}
         <header style={{ background: "var(--navy-900)", borderBottom: "2px solid var(--gold-500)", padding: "0 var(--pad)" }}>
           <div style={{ maxWidth: 960, margin: "0 auto", padding: "40px 0 36px" }}>
+            <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "'Source Sans 3', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.5)", textDecoration: "none", marginBottom: 16 }}>
+              <span style={{ fontSize: 16 }}>&larr;</span> Back to V2V
+            </a>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(200,162,50,0.15)", border: "1px solid rgba(200,162,50,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--gold-400)" }}>
                 <GavelIcon />
