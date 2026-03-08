@@ -123,7 +123,7 @@
     {
       "id": "bva-api-decisions",
       "name": "BVA Decision Search API (V2V)",
-      "url": "https://bva-api-524576132881.us-central1.run.app",
+      "url": "https://bva-api-301313738047.us-central1.run.app",
       "type": "bva-api",
       "category": "legal",
       "checkInterval": 12,

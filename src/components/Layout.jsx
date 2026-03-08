@@ -30,7 +30,7 @@ export function UtilityBar({ onSearchClick }) {
             <SearchIcon size={16} />
           </button>
           <a className="pub-utility-bar__link" href="#newsletter">Weekly Brief</a>
-          <a className="pub-utility-bar__link" href="#about">About</a>
+          <Link className="pub-utility-bar__link" to="/about">About</Link>
         </div>
       </div>
     </div>
@@ -88,10 +88,10 @@ export function Footer() {
     {
       title: 'Company',
       links: [
-        { label: 'About', path: '#about' },
-        { label: 'Contact', path: '#about' },
-        { label: 'Privacy', path: '#' },
-        { label: 'Terms', path: '#' },
+        { label: 'About', path: '/about' },
+        { label: 'Contact', path: '/contact' },
+        { label: 'Privacy', path: '/privacy' },
+        { label: 'Terms', path: '/terms' },
       ],
     },
   ];
@@ -110,16 +110,16 @@ export function Footer() {
         </div>
         <div className="pub-footer__columns">
           {columns.map((col) => (
-            <div key={col.title} className="pub-footer__col">
-              <div className="pub-footer__col-title">{col.title}</div>
-              {col.links.map((l) => (
-                l.path.startsWith('#') ? (
-                  <a key={l.label} className="pub-footer__col-link" href={l.path}>{l.label}</a>
-                ) : (
-                  <Link key={l.label} className="pub-footer__col-link" to={l.path}>{l.label}</Link>
-                )
-              ))}
-            </div>
+              <div key={col.title} className="pub-footer__col">
+                <div className="pub-footer__col-title">{col.title}</div>
+                {col.links.map((l) => (
+                  l.path.startsWith('#') ? (
+                    <a key={l.label} className="pub-footer__col-link" href={l.path}>{l.label}</a>
+                  ) : (
+                    <Link key={l.label} className="pub-footer__col-link" to={l.path}>{l.label}</Link>
+                  )
+                ))}
+              </div>
           ))}
         </div>
       </div>

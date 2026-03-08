@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify';
 import { Layout } from './components/Layout.jsx';
 import { useAccess } from './access.js';
 import { getTool, getTier } from './product-catalog.js';
-import { hasStripeCheckout, openStripeCheckout } from './billing.js';
+import { getStripePriceId, hasStripeCheckout, startStripeCheckout } from './billing.js';
 import './styles/publication.css';
 
 const API_BASE = import.meta.env.DEV ? "" : "https://vet-research-301313738047.us-central1.run.app";
@@ -165,6 +165,18 @@ export default function DecisionDeconstructor() {
     setIsAnalyzing(false);
   }, []);
 
+  const handleUpgrade = useCallback(async () => {
+    let nextUser = user;
+    if (getStripePriceId("professional") && !nextUser) {
+      const authResult = await signIn();
+      nextUser = authResult?.user || null;
+    }
+    await startStripeCheckout(nextUser, "professional", {
+      successPath: "/decision-deconstructor?checkout=success",
+      cancelPath: "/decision-deconstructor?checkout=cancelled",
+    });
+  }, [signIn, user]);
+
   const wordCount = decisionText.trim().split(/\s+/).filter(Boolean).length;
 
   return (
@@ -249,7 +261,7 @@ export default function DecisionDeconstructor() {
             )}
             {hasStripeCheckout("professional") ? (
               <button
-                onClick={() => openStripeCheckout("professional")}
+                onClick={handleUpgrade}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -264,7 +276,7 @@ export default function DecisionDeconstructor() {
                   fontFamily: "'Source Sans 3'",
                 }}
               >
-                Upgrade Access
+                {getStripePriceId("professional") && !user ? "Sign In to Upgrade" : "Upgrade Access"}
               </button>
             ) : (
               <Link

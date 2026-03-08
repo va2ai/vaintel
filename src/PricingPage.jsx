@@ -1,10 +1,22 @@
 import { Link } from 'react-router-dom';
 import { Layout } from './components/Layout.jsx';
 import { TIERS } from './product-catalog.js';
-import { hasStripeCheckout, openStripeCheckout } from './billing.js';
+import { useAccess } from './access.js';
+import { getStripePriceId, hasStripeCheckout, startStripeCheckout } from './billing.js';
 import './styles/publication.css';
 
 export default function PricingPage() {
+  const { user, signIn } = useAccess();
+
+  async function handleCheckout(plan) {
+    let nextUser = user;
+    if (getStripePriceId(plan) && !nextUser) {
+      const authResult = await signIn();
+      nextUser = authResult?.user || null;
+    }
+    await startStripeCheckout(nextUser, plan);
+  }
+
   return (
     <Layout activeSection="tools">
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "48px 20px 80px" }}>
@@ -56,7 +68,7 @@ export default function PricingPage() {
               </ul>
               {hasStripeCheckout(tier.slug) ? (
                 <button
-                  onClick={() => openStripeCheckout(tier.slug)}
+                  onClick={() => handleCheckout(tier.slug)}
                   style={{
                     display: "block",
                     width: "100%",
@@ -72,7 +84,11 @@ export default function PricingPage() {
                     fontFamily: "'Source Sans 3'",
                   }}
                 >
-                  {tier.slug === "pro" ? "Start Pro" : "Start Professional"}
+                  {getStripePriceId(tier.slug) && !user
+                    ? "Sign In to Subscribe"
+                    : tier.slug === "pro"
+                      ? "Start Pro"
+                      : "Start Professional"}
                 </button>
               ) : tier.slug === "free" && tier.ctaLink ? (
                 <Link to={tier.ctaLink} style={{

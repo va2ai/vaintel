@@ -4,8 +4,12 @@ import { lazyAuth, lazyGoogleProvider } from "./firebase.js";
 import { getSubscription, getUsageMeter, incrementUsageMeter } from "./firestore.js";
 import { getUsageState } from "./product-catalog.js";
 
+const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing", "past_due"]);
+
 function normalizePlan(subscription) {
   if (!subscription?.plan) return "free";
+  const status = String(subscription.status || "active").toLowerCase();
+  if (!ACTIVE_SUBSCRIPTION_STATUSES.has(status)) return "free";
   return String(subscription.plan).toLowerCase();
 }
 

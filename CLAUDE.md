@@ -80,8 +80,9 @@ public/              # Static assets
 - CORS allows: `vaclaims-194006.web.app`, `vaclaims-194006.firebaseapp.com`, `localhost:5173`
 
 ### BVA API (Cloud Run)
-- **Project:** `vaclaims-194006`
-- **URL:** https://bva-api-524576132881.us-central1.run.app
+- **Project:** `pro-habitat-485707-p7`
+- **URL:** https://bva-api-301313738047.us-central1.run.app
+- Deploy: `cd C:/Users/ccdmn/code/bvaapi && gcloud run deploy bva-api --source . --region us-central1 --project pro-habitat-485707-p7`
 
 ## Key Conventions
 

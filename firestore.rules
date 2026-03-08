@@ -61,6 +61,38 @@ service cloud.firestore {
       allow create, update, delete: if isAdminEmail();
     }
 
+    match /products/{productId} {
+      allow read: if true;
+
+      match /prices/{priceId} {
+        allow read: if true;
+      }
+
+      match /tax_rates/{taxRateId} {
+        allow read: if true;
+      }
+    }
+
+    match /customers/{uid} {
+      allow read: if isAdminEmail() || isSelf(uid);
+      allow write: if false;
+
+      match /checkout_sessions/{sessionId} {
+        allow create: if isSelf(uid)
+          && request.resource.data.mode == "subscription"
+          && request.resource.data.price is string
+          && request.resource.data.success_url is string
+          && request.resource.data.cancel_url is string;
+        allow read: if isAdminEmail() || isSelf(uid);
+        allow update, delete: if false;
+      }
+
+      match /subscriptions/{subscriptionId} {
+        allow read: if isAdminEmail() || isSelf(uid);
+        allow write: if false;
+      }
+    }
+
     match /usageMeters/{docId} {
       allow read: if isAdminEmail()
         || (isSignedIn() && docId.matches('^' + request.auth.uid + '_.*$'));

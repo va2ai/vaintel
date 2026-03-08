@@ -7,6 +7,7 @@ import NexusScout from "./NexusScout.jsx";
 import Admin from "./Admin.jsx";
 import PricingPage from "./PricingPage.jsx";
 import DecisionDeconstructor from "./DecisionDeconstructor.jsx";
+import InfoPage from "./InfoPage.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 
 function App() {
@@ -19,6 +20,10 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/decision-deconstructor" element={<DecisionDeconstructor />} />
+        <Route path="/about" element={<InfoPage pageKey="about" />} />
+        <Route path="/contact" element={<InfoPage pageKey="contact" />} />
+        <Route path="/privacy" element={<InfoPage pageKey="privacy" />} />
+        <Route path="/terms" element={<InfoPage pageKey="terms" />} />
         <Route path="/*" element={<V2VSite />} />
       </Routes>
     </BrowserRouter>
