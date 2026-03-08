@@ -1,0 +1,82 @@
+---
+title: "Multi-Agent Nano Banana Image App — System Architecture"
+---
+graph TB
+    subgraph Frontend["🖥️ Frontend — React + AG-UI"]
+        UI["User Interface<br/>Prompt Input • Gallery • Edit Panel"]
+        StateSync["AG-UI State Sync<br/>SSE Events • HITL Gates"]
+    end
+
+    subgraph Orchestrator["🧠 Orchestrator Agent — Claude Sonnet 4.5"]
+        Supervisor["Supervisor Node<br/>Intent Classification • Task Decomposition"]
+        Router["Smart Router<br/>Route to specialist agents"]
+    end
+
+    subgraph Specialists["⚙️ Specialist Agents"]
+        PromptAgent["🎨 Prompt Engineer Agent<br/>Claude Haiku 4.5<br/>Enhance • Structure • Style Tags"]
+        GenAgent["🖼️ Generation Agent<br/>Gemini 3.1 Flash Image<br/>Text-to-Image • Aspect Ratios"]
+        EditAgent["✏️ Edit Agent<br/>Gemini 3.1 Flash Image<br/>Image Editing • Inpainting"]
+        CriticAgent["🔍 Critic Agent<br/>Claude Haiku 4.5<br/>Quality Check • Safety • Retry Logic"]
+        StyleAgent["🎭 Style Transfer Agent<br/>Gemini 3 Pro Image<br/>Reference Images • Consistency"]
+    end
+
+    subgraph Tools["🔧 MCP Tool Layer"]
+        GeminiMCP["Gemini API MCP Server<br/>generateContent • imageConfig"]
+        StorageMCP["Storage MCP Server<br/>Image persistence • Gallery"]
+        SearchMCP["Image Search MCP<br/>Reference images • Style lookup"]
+    end
+
+    subgraph Memory["💾 Memory Layer"]
+        SessionMem["Session Memory<br/>Conversation history • Edit chain"]
+        StyleMem["Style Preferences<br/>User aesthetic profile"]
+        GalleryMem["Gallery Store<br/>Generated images • Metadata"]
+    end
+
+    subgraph Observability["📊 Observability"]
+        Tracing["OpenTelemetry Tracing<br/>LangSmith / Logfire"]
+        CostTrack["Cost Tracker<br/>Per-agent token + image costs"]
+        Evals["Eval Harness<br/>Prompt quality • Image fidelity"]
+    end
+
+    UI -->|"User prompt + config"| StateSync
+    StateSync -->|"AG-UI events"| Supervisor
+    Supervisor --> Router
+
+    Router -->|"Generate"| PromptAgent
+    Router -->|"Edit"| EditAgent
+    Router -->|"Style transfer"| StyleAgent
+
+    PromptAgent -->|"Enhanced prompt"| GenAgent
+    GenAgent -->|"Generated image"| CriticAgent
+    EditAgent -->|"Edited image"| CriticAgent
+    StyleAgent -->|"Styled image"| CriticAgent
+
+    CriticAgent -->|"✅ Pass"| UI
+    CriticAgent -->|"❌ Retry"| PromptAgent
+
+    GenAgent --> GeminiMCP
+    EditAgent --> GeminiMCP
+    StyleAgent --> GeminiMCP
+    PromptAgent --> SearchMCP
+
+    CriticAgent --> SessionMem
+    GenAgent --> GalleryMem
+    PromptAgent --> StyleMem
+
+    Supervisor --> Tracing
+    GenAgent --> CostTrack
+    CriticAgent --> Evals
+
+    classDef frontend fill:#1a1a2e,stroke:#FFD700,color:#FFD700,stroke-width:2px
+    classDef orchestrator fill:#16213e,stroke:#0f3460,color:#e94560,stroke-width:2px
+    classDef specialist fill:#0f3460,stroke:#FFD700,color:#fff,stroke-width:1px
+    classDef tools fill:#533483,stroke:#e94560,color:#fff,stroke-width:1px
+    classDef memory fill:#2b2d42,stroke:#8d99ae,color:#edf2f4,stroke-width:1px
+    classDef obs fill:#1b263b,stroke:#778da9,color:#e0e1dd,stroke-width:1px
+
+    class UI,StateSync frontend
+    class Supervisor,Router orchestrator
+    class PromptAgent,GenAgent,EditAgent,CriticAgent,StyleAgent specialist
+    class GeminiMCP,StorageMCP,SearchMCP tools
+    class SessionMem,StyleMem,GalleryMem memory
+    class Tracing,CostTrack,Evals obs
