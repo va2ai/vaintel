@@ -90,6 +90,6 @@ public/              # Static assets
 - Build scripts are CommonJS (`.cjs`) since the project is `"type": "module"`
 - Scripts and docs have been moved to `scripts/` and `docs/` directories
 - `veteran2veteran-site.jsx` lives in `src/` (the main site component)
-- Product tiers: Free / Pro / Professional (see `docs/PRODUCT_CATALOG.md`)
-- Brand language and nav spec: `docs/BRAND_LANGUAGE_AND_NAV.md`
+- Product tiers, brand language, nav spec: `docs/PRODUCT_AND_BRAND.md`
+- Strategy and roadmap: `docs/STRATEGY_AND_ROADMAP.md`
 - Production API URLs are hardcoded in components (`import.meta.env.DEV` check), not env vars, because firebase predeploy doesn't pass env vars

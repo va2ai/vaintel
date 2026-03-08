@@ -3,5 +3,10 @@ functions/node_modules/
 dist/
 .env
 stripe-key.txt
+.firebase/
+.claude/
+scripts/content-pipeline/output/
+docs/*.txt
+docs/txt/
 .DS_Store
 *.log

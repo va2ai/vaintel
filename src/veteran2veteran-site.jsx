@@ -46,6 +46,29 @@ function filterVisible(items) {
   return (items || []).filter((item) => !item.hidden);
 }
 
+function mergeByIdWithStaticFallback(primaryItems = [], fallbackItems = []) {
+  const fallbackById = new Map(
+    (fallbackItems || []).map((item) => [String(item.id), item]),
+  );
+
+  return (primaryItems || []).map((item) => {
+    const fallback = fallbackById.get(String(item.id));
+    if (!fallback) return item;
+
+    const merged = { ...fallback, ...item };
+
+    for (const [key, value] of Object.entries(item)) {
+      if (value === undefined || value === null || value === "") {
+        if (fallback[key] !== undefined && fallback[key] !== null && fallback[key] !== "") {
+          merged[key] = fallback[key];
+        }
+      }
+    }
+
+    return merged;
+  });
+}
+
 async function loadStaticContent() {
   const [postsRes, newsRes, guidesRes] = await Promise.all([
     fetch("/posts.json"),
@@ -92,16 +115,17 @@ export default function V2VSite() {
 
     const loadContent = async () => {
       try {
-        const [postsData, guidesData, newsData] = await Promise.all([
+        const [postsData, guidesData, newsData, staticContent] = await Promise.all([
           getPosts(),
           getGuides(),
           getNews(),
+          loadStaticContent().catch(() => null),
         ]);
 
         if (cancelled) return;
-        setPosts(filterVisible(postsData));
+        setPosts(filterVisible(mergeByIdWithStaticFallback(postsData, staticContent?.posts)));
         setGuides(guidesData);
-        setNews(filterVisible(newsData));
+        setNews(filterVisible(mergeByIdWithStaticFallback(newsData, staticContent?.news)));
       } catch (firestoreError) {
         console.warn("Falling back to static content files:", firestoreError);
         try {
